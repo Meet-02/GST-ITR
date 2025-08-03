@@ -105,7 +105,6 @@
   }
   
   /* Get Started Button */
-/* From Uiverse.io by Li-Deheng */ 
 .btn-conteiner {
     display: flex;
     justify-content: center;
@@ -129,7 +128,6 @@
     transition: 1s;
     border-radius: 100px;
     box-shadow: 0 0 0.2em 0 var(--color-background);
-
   }
   
   .btn-content:hover, .btn-content:focus {

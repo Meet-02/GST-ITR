@@ -8,11 +8,15 @@ app.secret_key = 'your_secret_key_here'
 db_path = os.path.join(os.path.dirname(__file__), 'database/mydata.db')
 
 @app.route('/')
+def landing():
+    return render_template('landingpage.html')
+
+@app.route('/signup')
 def sign_up():
     return render_template('sign-up.html')
 
 def PANno(PAN):
-    a = r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$'
+    a = r'^[A-Z]{2}SPK[0-9]{4}[A-Z]{1}$'
     return bool(re.match(a, PAN))
 
 @app.route('/signup', methods=['POST'])
