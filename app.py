@@ -16,7 +16,7 @@ def sign_up():
     return render_template('sign-up.html')
 
 def PANno(PAN):
-    a = r'^[A-Z]{2}SPK[0-9]{4}[A-Z]{1}$'
+    a = r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$'
     return bool(re.match(a, PAN))
 
 @app.route('/signup', methods=['POST'])
