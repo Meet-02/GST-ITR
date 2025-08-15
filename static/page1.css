@@ -1,0 +1,170 @@
+body {
+    background: linear-gradient(135deg, #eef2f7, #d6e0f5);
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Header */
+#header {
+    background-color: #2a3a8d;
+    color: white;
+    padding: 0.8rem 2rem;
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 95%;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+#header img {
+    height: 35px;
+    margin-right: 10px;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.header-buttons .btn {
+    background-color: white;
+    color: #2a3a8d;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.header-buttons .btn:hover {
+    background-color: #e6e9f5;
+}
+
+/* Banner */
+.banner {
+    margin-top: 80px;
+    text-align: center;
+    padding: 2rem;
+    background: url('https://img.freepik.com/free-vector/tax-time-background-design_23-2148652001.jpg') center/cover no-repeat;
+    color: white;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.banner h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+.banner p {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+}
+/* stepper progress */
+.stepper {
+    display: flex;
+    align-items: center;
+    padding-right: 3rem;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    width: 70%;
+    padding-left: 16rem;
+}
+.step {
+    width: 35px;
+    height: 35px;
+    border: 2px solid #2a3a8d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background: white;
+    color: #2a3a8d;
+    transition: all 0.3s ease;
+}
+.step.completed {
+    background: #2a3a8d;
+    color: white;
+}
+.line {
+    flex: 1;
+    height: 3px;
+    background: #ccc;
+}
+.hidden {
+    display: none;
+}
+
+/* Form Container */
+.outer-container {
+    display: flex;
+    justify-content: center;
+    padding: 3rem 1rem;
+}
+.content-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 700px;
+}
+.form-section h1 {
+    color: #2a3a8d;
+    margin-bottom: 1.5rem;
+}
+.field-label i {
+    margin-right: 8px;
+    color: #2a3a8d;
+}
+.input-field {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+.input-field:focus {
+    border-color: #2a3a8d;
+    outline: none;
+}
+.section-title {
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+/* Hidden Sections */
+.hidden-section {
+    display: none;
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: 8px;
+    background: #f4f6fc;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .banner {
+        font-size: 0.9rem;
+    }
+    .stepper{
+        padding-left: 2.5rem;
+        width: 80%;
+    }
+}

@@ -39,7 +39,7 @@ def signup():
             cursor.execute('INSERT INTO user (PAN_ID, Password) VALUES (?, ?)', (pan, password))
             conn.commit()
             flash("Signup successful")
-            return redirect(url_for('index'))
+            return redirect(url_for('form'))
         except sqlite3.IntegrityError:
             flash("PAN number already exists")
             return render_template('sign-up.html') 
@@ -55,14 +55,14 @@ def login():
         user = cursor.fetchone()
         if user:
             flash("Login successful")
-            return redirect(url_for('index'))
+            return redirect(url_for('form'))
         else:
             flash("Invalid PAN number or password")
             return render_template('sign-up.html') 
 
-@app.route('/index')
-def index():
-    return render_template('index.html')
+@app.route('/form')
+def form():
+    return render_template('page1.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
