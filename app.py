@@ -62,7 +62,25 @@ def login():
 
 @app.route('/form')
 def form():
+    Name = request.form.get('name')
+    Father = request.form.get('father')
+    DOB = request.form.get('dob')
+    Gender = request.form.get('gender')
+    Email = request.form.get('email')
+    Aadhar = request.form.get('aadhar')
+    Mobile = request.form.get('mno')
+    Bussname = request.form.get('Business')
+    DOR = request.form.get('dor')
+    GSTIN = request.form.get('gstin')
+    NatureBuss = request.form.get('nob')
+    Empcat = request.form.get('empc')
+    Emptan = request.form.get('tan')
+
+
+
     return render_template('page1.html')
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

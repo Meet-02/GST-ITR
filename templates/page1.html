@@ -60,9 +60,6 @@
                 <label class="field-label" for="email"><i class="fa-solid fa-envelope"></i> Email Address <span class="asterisk">*</span></label>
                 <input type="email" class="input-field" id="email" name="email" required>
 
-                <label class="field-label" for="PAN"><i class="fa-solid fa-id-card"></i> PAN Number <span class="asterisk">*</span></label>
-                <input type="text" class="input-field" id="PAN" maxlength="10" name="PAN" required>
-
                 <label class="field-label" for="Aadhar"><i class="fa-solid fa-address-card"></i> Aadhar Number <span class="asterisk">*</span></label>
                 <input type="number" class="input-field" id="Aadhar" maxlength="12" name="Aadhar" required>
 
@@ -87,7 +84,20 @@
                     <input type="text" class="input-field" id="gstin" maxlength="15" name="gstin">
 
                     <label class="field-label" for="nob">Nature of Business<span class="asterisk">*</span></label>
-                    <input type="text" class="input-field" id="nob" name="nob">
+                    <select class="input-field" id="nob" name="nob">
+                        <option value="" selected disabled>Select Nature of Business</option>
+                        <option>Manufacturing</option>
+                        <option>Trading</option>
+                        <option>Services</option>
+                        <option>Agriculture</option>
+                        <option>Financial Services</option>
+                        <option>IT & Software</option>
+                        <option>Consultancy</option>
+                        <option>E-commerce</option>
+                        <option>Hospitality</option>
+                        <option>Real Estate</option>
+                        <option>Others</option>
+                    </select>
                 </section>
 
                 <!-- Job Section -->
@@ -109,6 +119,7 @@
             </div>
         </div>
     </div>
+
 
     <script src="{{ url_for('static', filename='pg1.js') }}"></script>
 </body>
