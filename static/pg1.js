@@ -9,17 +9,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     radioButtons.forEach(radio => {
         radio.addEventListener('change', function () {
-            if (this.value === 'job') {
+            if (this.value === 'Job Person') {
                 jobSection.style.display = 'block';
                 businessSection.style.display = 'none';
-            } else if (this.value === 'business') {
+            } else if (this.value === 'Business Person') {
                 businessSection.style.display = 'block';
                 jobSection.style.display = 'none';
             }
         });
     });
 });
-
 
 // Header scroll behavior
 const header = document.getElementById('header');
@@ -65,4 +64,3 @@ function nextStep(current) {
         document.getElementById(`step-${next}`).classList.remove("hidden");
     }
 }
-

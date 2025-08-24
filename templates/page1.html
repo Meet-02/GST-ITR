@@ -24,7 +24,8 @@
         <h1><i class="fa-solid fa-file-invoice-dollar"></i> Easy GST & ITR Filing</h1>
         <p>Fill in your details to get started with a smooth and hassle-free process.</p>
     </div>
-    <div class="stepper">
+
+    <!-- <div class="stepper">
         <div class="step active" data-step="1">1</div>
         <div class="line"></div>
         <div class="step" data-step="2">2</div>
@@ -32,7 +33,7 @@
         <div class="step" data-step="3">3</div>
         <div class="line"></div>
         <div class="step" data-step="4">4</div>
-    </div>
+    </div> -->
 
     <!-- Main Form -->
     <div class="outer-container">
@@ -40,86 +41,101 @@
             <div class="form-section">
                 <h1><i class="fa-solid fa-user"></i> User Details</h1>
 
-                <label class="field-label" for="name"><i class="fa-solid fa-id-badge"></i> Name <span class="asterisk">*</span></label>
-                <input type="text" class="input-field" id="name" name="name" required>
+                <!-- ✅ FORM START -->
+                <form action="{{ url_for('common_details') }}" method="POST">
 
-                <label class="field-label" for="father"><i class="fa-solid fa-user-group"></i> Father’s / Guardian’s Name <span class="asterisk">*</span></label>
-                <input type="text" class="input-field" id="father" name="father" required>
+                    <label class="field-label" for="name"><i class="fa-solid fa-id-badge"></i> Name <span class="asterisk">*</span></label>
+                    <input type="text" class="input-field" id="name" name="name" required>
 
-                <label class="field-label" for="dob"><i class="fa-solid fa-calendar"></i> Date of Birth <span class="asterisk">*</span></label>
-                <input type="date" class="input-field" id="dob" name="dob" required>
+                    <label class="field-label" for="father"><i class="fa-solid fa-user-group"></i> Father’s / Guardian’s Name <span class="asterisk">*</span></label>
+                    <input type="text" class="input-field" id="father" name="father" required>
 
-                <label class="field-label" for="gender"><i class="fa-solid fa-venus-mars"></i> Gender <span class="asterisk">*</span></label>
-                <select class="input-field" id="gender" name="gender" required>
-                    <option value="" selected disabled>Select</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                </select>
+                    <label class="field-label" for="dob"><i class="fa-solid fa-calendar"></i> Date of Birth <span class="asterisk">*</span></label>
+                    <input type="date" class="input-field" id="dob" name="dob" required>
 
-                <label class="field-label" for="email"><i class="fa-solid fa-envelope"></i> Email Address <span class="asterisk">*</span></label>
-                <input type="email" class="input-field" id="email" name="email" required>
-
-                <label class="field-label" for="Aadhar"><i class="fa-solid fa-address-card"></i> Aadhar Number <span class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="Aadhar" maxlength="12" name="Aadhar" required>
-
-                <label class="field-label" for="mno"><i class="fa-solid fa-phone"></i> Mobile Number <span class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="mno" maxlength="10" name="mno" required>
-
-                <!-- Category Selection -->
-                <p class="section-title"><i class="fa-solid fa-briefcase"></i> Select your category:</p>
-                <label><input type="radio" name="userType" value="job"> Job Person</label>
-                <label><input type="radio" name="userType" value="business"> Business Person</label>
-
-                <!-- Business Section -->
-                <section id="infobusiness" class="hidden-section">
-                    <h2><i class="fa-solid fa-building"></i> For Businesses</h2>
-                    <label class="field-label" for="Business">Business Name<span class="asterisk">*</span></label>
-                    <input type="text" class="input-field" id="Business" name="Business">
-
-                    <label class="field-label" for="dor">Date of GST Registration<span class="asterisk">*</span></label>
-                    <input type="date" class="input-field" id="dor" name="dor">
-
-                    <label class="field-label" for="gstin">GSTIN<span class="asterisk">*</span></label>
-                    <input type="text" class="input-field" id="gstin" maxlength="15" name="gstin">
-
-                    <label class="field-label" for="nob">Nature of Business<span class="asterisk">*</span></label>
-                    <select class="input-field" id="nob" name="nob">
-                        <option value="" selected disabled>Select Nature of Business</option>
-                        <option>Manufacturing</option>
-                        <option>Trading</option>
-                        <option>Services</option>
-                        <option>Agriculture</option>
-                        <option>Financial Services</option>
-                        <option>IT & Software</option>
-                        <option>Consultancy</option>
-                        <option>E-commerce</option>
-                        <option>Hospitality</option>
-                        <option>Real Estate</option>
-                        <option>Others</option>
-                    </select>
-                </section>
-
-                <!-- Job Section -->
-                <section id="infojob" class="hidden-section">
-                    <h2><i class="fa-solid fa-user-tie"></i> For Job</h2>
-                    <label class="field-label" for="empc">Employer Category<span class="asterisk">*</span></label>
-                    <select class="input-field" id="empc" name="empc">
+                    <label class="field-label" for="gender"><i class="fa-solid fa-venus-mars"></i> Gender <span class="asterisk">*</span></label>
+                    <select class="input-field" id="gender" name="gender" required>
                         <option value="" selected disabled>Select</option>
-                        <option>Central Government</option>
-                        <option>State Government</option>
-                        <option>PSU</option>
-                        <option>Private Sector</option>
-                        <option>Public Sector</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
                     </select>
 
-                    <label class="field-label" for="tan">Employer TAN Number <span class="asterisk">*</span></label>
-                    <input type="text" class="input-field" id="tan" name="tan">
-                </section>
+                    <label class="field-label" for="email"><i class="fa-solid fa-envelope"></i> Email Address <span class="asterisk">*</span></label>
+                    <input type="email" class="input-field" id="email" name="email" required>
+
+                    <label class="field-label" for="aadhar"><i class="fa-solid fa-address-card"></i> Aadhar Number <span class="asterisk">*</span></label>
+                    <input type="number" class="input-field" id="aadhar" name="aadhar" maxlength="12" required>
+
+                    <label class="field-label" for="mno"><i class="fa-solid fa-phone"></i> Mobile Number <span class="asterisk">*</span></label>
+                    <input type="number" class="input-field" id="mno" name="mno" maxlength="10" required>
+
+                    <!-- Category Selection -->
+                    <p class="section-title"><i class="fa-solid fa-briefcase"></i> Select your category:</p>
+                    <label><input type="radio" name="userType" value="Job Person"> Job Person</label>
+                    <label><input type="radio" name="userType" value="Business Person"> Business Person</label>
+
+                    <!-- Business Section -->
+                    <section id="infobusiness" class="hidden-section">
+                        <h2><i class="fa-solid fa-building"></i> For Businesses</h2>
+
+                        <label class="field-label" for="Bussname">Business Name<span class="asterisk">*</span></label>
+                        <input type="text" class="input-field" id="Bussname" name="Bussname">
+
+                        <label class="field-label" for="DOR">Date of GST Registration<span class="asterisk">*</span></label>
+                        <input type="date" class="input-field" id="DOR" name="DOR">
+
+                        <label class="field-label" for="GSTIN">GSTIN<span class="asterisk">*</span></label>
+                        <input type="text" class="input-field" id="GSTIN" name="GSTIN" maxlength="15">
+
+                        <label class="field-label" for="nob">Nature of Business<span class="asterisk">*</span></label>
+                        <select class="input-field" id="nob" name="nob">
+                            <option value="" selected disabled>Select Nature of Business</option>
+                            <option>Manufacturing</option>
+                            <option>Trading</option>
+                            <option>Services</option>
+                            <option>Agriculture</option>
+                            <option>Financial Services</option>
+                            <option>IT & Software</option>
+                            <option>Consultancy</option>
+                            <option>E-commerce</option>
+                            <option>Hospitality</option>
+                            <option>Real Estate</option>
+                            <option>Others</option>
+                        </select>
+                    </section>
+
+                    <!-- Job Section -->
+                    <section id="infojob" class="hidden-section">
+                        <h2><i class="fa-solid fa-user-tie"></i> For Job</h2>
+
+                        <label class="field-label" for="empc">Employer Category<span class="asterisk">*</span></label>
+                        <select class="input-field" id="empc" name="empc">
+                            <option value="" selected disabled>Select</option>
+                            <option>Central Government</option>
+                            <option>State Government</option>
+                            <option>PSU</option>
+                            <option>Private Sector</option>
+                            <option>Public Sector</option>
+                        </select>
+
+                        <label class="field-label" for="tan">Employer TAN Number <span class="asterisk">*</span></label>
+                        <input type="text" class="input-field" id="tan" name="tan">
+                    </section>
+
+                    <div class="button">
+                        <button type="submit">
+                            <span class="shadow"></span>
+                            <span class="edge"></span>
+                            <span class="front text"> Submit</span>
+                        </button>
+                    </div>
+                </form>
+                <!-- ✅ FORM END -->
+
             </div>
         </div>
     </div>
-
 
     <script src="{{ url_for('static', filename='pg1.js') }}"></script>
 </body>

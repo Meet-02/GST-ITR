@@ -5,7 +5,10 @@ import re
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
-db_path = os.path.join(os.path.dirname(__file__), 'database/mydata.db')
+
+# Absolute base dir
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+db_path = os.path.join(BASE_DIR, 'database/mydata.db')
 
 @app.route('/')
 def landing():
@@ -14,6 +17,10 @@ def landing():
 @app.route('/signup')
 def sign_up():
     return render_template('sign-up.html')
+
+@app.route('/page1')
+def details():
+    return render_template('page1.html')
 
 def PANno(PAN):
     a = r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$'
@@ -39,7 +46,7 @@ def signup():
             cursor.execute('INSERT INTO user (PAN_ID, Password) VALUES (?, ?)', (pan, password))
             conn.commit()
             flash("Signup successful")
-            return redirect(url_for('form'))
+            return redirect(url_for('common_details'))
         except sqlite3.IntegrityError:
             flash("PAN number already exists")
             return render_template('sign-up.html') 
@@ -55,13 +62,13 @@ def login():
         user = cursor.fetchone()
         if user:
             flash("Login successful")
-            return redirect(url_for('form'))
+            return redirect(url_for('common_details'))
         else:
             flash("Invalid PAN number or password")
             return render_template('sign-up.html') 
 
-@app.route('/form')
-def form():
+@app.route('/page1' ,methods = ['POST'])
+def common_details():
     Name = request.form.get('name')
     Father = request.form.get('father')
     DOB = request.form.get('dob')
@@ -69,18 +76,49 @@ def form():
     Email = request.form.get('email')
     Aadhar = request.form.get('aadhar')
     Mobile = request.form.get('mno')
-    Bussname = request.form.get('Business')
-    DOR = request.form.get('dor')
-    GSTIN = request.form.get('gstin')
-    NatureBuss = request.form.get('nob')
-    Empcat = request.form.get('empc')
-    Emptan = request.form.get('tan')
+    category = request.form.get('userType')
 
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
 
+        # Insert into people_info
+        cursor.execute('''
+            INSERT INTO people_info 
+            (name, fathers_guardian_name, date_of_birth, gender, email, aadhar_number, mobile_number)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (Name, Father, DOB, Gender, Email, Aadhar, Mobile))
 
-    return render_template('page1.html')
+        person_id = cursor.lastrowid   # get the new person id
 
+        # Insert into job_person or businesses based on category
+        if category == "Job Person":
+            employer_category = request.form.get('empc')
+            employer_tan = request.form.get('tan')
 
+            cursor.execute('''
+                INSERT INTO job_person (person_id, employer_category, employer_tan_number)
+                VALUES (?, ?, ?)
+            ''', (person_id, employer_category, employer_tan))
+
+        elif category == "Business Person":
+            business_name = request.form.get('Bussname')
+            gst_date = request.form.get('DOR')
+            gstin = request.form.get('GSTIN')
+            nature = request.form.get('nob')
+
+            cursor.execute('''
+                INSERT INTO businesses (person_id, business_name, date_of_gst_registration, gstin, nature_of_business)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (person_id, business_name, gst_date, gstin, nature))
+
+        conn.commit()
+
+        flash("Details submitted successfully!")
+        return redirect(url_for('index'))
+
+@app.route('/index')
+def index():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
