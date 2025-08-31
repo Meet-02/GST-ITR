@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, redirect, flash, url_for
+from werkzeug.security import generate_password_hash,check_password_hash
 import sqlite3
 import os
 import re
@@ -18,9 +19,13 @@ def landing():
 def sign_up():
     return render_template('sign-up.html')
 
-@app.route('/page1')
+@app.route('/details')
 def details():
     return render_template('page1.html')
+
+@app.route('/details/Business')
+def business():
+    return render_template("page2.html")
 
 def PANno(PAN):
     a = r'^[A-Z]{5}[0-9]{4}[A-Z]{1}$'
@@ -43,7 +48,7 @@ def signup():
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         try:
-            cursor.execute('INSERT INTO user (PAN_ID, Password) VALUES (?, ?)', (pan, password))
+            cursor.execute('INSERT INTO user (PAN_ID, Password) VALUES (?, ?)', (pan, generate_password_hash(password)))
             conn.commit()
             flash("Signup successful")
             return redirect(url_for('common_details'))
@@ -58,16 +63,22 @@ def login():
 
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM user WHERE PAN_ID = ? AND Password = ?', (pan, password))
+        cursor.execute('SELECT * FROM user WHERE PAN_ID = ?', (pan,))
         user = cursor.fetchone()
-        if user:
-            flash("Login successful")
-            return redirect(url_for('common_details'))
-        else:
-            flash("Invalid PAN number or password")
-            return render_template('sign-up.html') 
 
-@app.route('/page1' ,methods = ['POST'])
+        if user:
+            stored_hash = user[2]  
+            if check_password_hash(stored_hash, password):
+                flash("Login successful")
+                return redirect(url_for('common_details'))
+            else:
+                flash("Invalid password")
+        else:
+            flash("Invalid PAN number")
+
+    return render_template('sign-up.html')
+
+@app.route('/details' ,methods = ['POST'])
 def common_details():
     Name = request.form.get('name')
     Father = request.form.get('father')
@@ -100,6 +111,7 @@ def common_details():
                 VALUES (?, ?, ?)
             ''', (person_id, employer_category, employer_tan))
 
+        
         elif category == "Business Person":
             business_name = request.form.get('Bussname')
             gst_date = request.form.get('DOR')
@@ -114,9 +126,12 @@ def common_details():
         conn.commit()
 
         flash("Details submitted successfully!")
-        return redirect(url_for('index'))
+        if category == "Business Person":
+            return redirect(url_for("business"))
+        elif category == "Job Person":
+            return redirect(url_for("index"))
 
-@app.route('/index')
+@app.route('/details/Job')
 def index():
     return render_template('index.html')
 

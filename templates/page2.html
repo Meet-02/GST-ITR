@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Details - GST & ITR</title>
-    <link rel="stylesheet" href="../static/pg2.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='pg2.css') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
@@ -14,8 +14,7 @@
     <!-- Fixed Header -->
     <header id="header">
         <div class="logo-area">
-            <!-- Add this at the top of your <body> in page2.html -->
-            <img src="../static/IMAGES/Untitled__2_-removebg-preview.png" alt="Header Photo" class="header-photo">
+            <img src="{{ url_for('static', filename='IMAGES/Untitled__2_-removebg-preview.png') }}" alt="Header Photo" class="header-photo">
             <span>GST & ITR Portal</span>
         </div>
     </header>
@@ -112,15 +111,11 @@
                     <option>Inter-State</option>
                 </select>
 
-
-
-
-
             </div>
         </div>
     </div>
 
-    <script src="../static/pg1.js"></script>
+    <script src="{{ url_for('static', filename='pg2.js') }}"></script>
 </body>
 
 </html>
