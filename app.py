@@ -181,12 +181,12 @@ def businessdet():
 # JOB DETAILS
 @app.route('/details/Job', methods=['POST'])
 def jobdet():
-    fin_y = request.form.get('financial_year')
-    bas_sal = request.form.get('basic_salary')
-    hra_rec = request.form.get('hra_received')
-    sav_int = request.form.get('saving_interest')
-    fd_int = request.form.get('fd_interest')
-    oth_inc = request.form.get('other_income')
+    fin_y = float(request.form.get('financial_year', 0))
+    bas_sal = float(request.form.get('basic_salary', 0))
+    hra_rec = float(request.form.get('hra_received', 0))
+    sav_int = float(request.form.get('saving_interest', 0))
+    fd_int =float(request.form.get('fd_interest', 0))
+    oth_inc = float(request.form.get('other_income', 0))
 
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
@@ -202,25 +202,27 @@ def jobdet():
 # JOB DEDUCTIONS
 @app.route('/details/Job/deduct', methods=['POST'])
 def jobdeduct():
-    epf_ppf = request.form.get('epf_ppf')
-    life_ins = request.form.get('life_insurance')
-    elss = request.form.get('elss')
-    home_loan_principal = request.form.get('home_loan_principal')
-    tuition = request.form.get('tuition_fees')
-    other_80c = request.form.get('other_80c')
-    health_ins_self = request.form.get('health_insurance_self')
-    health_ins_parents = request.form.get('health_insurance_parents')
-    home_loan_interest = request.form.get('home_loan_interest')
-    education_loan = request.form.get('education_loan_interest')
-    donations = request.form.get('donations')
+    epf_ppf = float(request.form.get('epf_ppf', 0))
+    life_ins = float(request.form.get('life_insurance', 0))
+    elss = float(request.form.get('elss', 0))
+    home_loan_principal = float(request.form.get('home_loan_principal', 0))
+    tuition = float(request.form.get('tuition_fees', 0))
+    other_80c = float(request.form.get('other_80c', 0))
+    health_ins_self = float(request.form.get('health_insurance_self', 0))
+    health_ins_parents = float(request.form.get('health_insurance_parents', 0))
+    home_loan_interest = float(request.form.get('home_loan_interest', 0))
+    education_loan = float(request.form.get('education_loan_interest', 0))
+    donations = float(request.form.get('donations', 0))
+    tds = float(request.form.get('tds', 0))
+
 
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute('''
         INSERT INTO job_deductions(section_80c_epf_ppf, section_80c_life_insurance, section_80c_elss_mutual_funds, section_80c_home_loan_principal, section_80c_childrens_tuition, section_80c_other_investments,
-        section_80d_health_insurance_self_family, section_80d_health_insurance_parents, section_24_home_loan_interest_paid, section_80e_education_loan_interest_paid, section_80g_donations_charity)
-        VALUES(?,?,?,?,?,?,?,?,?,?,?)
-        ''', (epf_ppf, life_ins, elss, home_loan_principal, tuition, other_80c, health_ins_self, health_ins_parents, home_loan_interest, education_loan, donations))
+        section_80d_health_insurance_self_family, section_80d_health_insurance_parents, section_24_home_loan_interest_paid, section_80e_education_loan_interest_paid, section_80g_donations_charity,tds)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
+        ''', (epf_ppf, life_ins, elss, home_loan_principal, tuition, other_80c, health_ins_self, health_ins_parents, home_loan_interest, education_loan, donations,tds))
 
         return redirect(url_for("index"))
 

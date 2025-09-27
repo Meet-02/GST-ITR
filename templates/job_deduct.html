@@ -29,49 +29,71 @@
         <div class="line"></div>
         <div class="step" data-step="3">3</div>
     </div>
-    
+
 
     <div class="outer-container">
         <div class="content-container">
             <div class="form-section">
-                
+
                 <form action="{{ url_for('jobdeduct') }}" method="POST">
 
                     <h1 class="section-title"><i class="fa-solid fa-shield-halved"></i> Tax Saving Deductions</h1>
 
-                    <label class="field-label" for="epf_ppf"><i class="fa-solid fa-piggy-bank"></i> Section 80C: EPF / PPF Contribution</label>
+                    <label class="field-label" for="epf_ppf"><i class="fa-solid fa-piggy-bank"></i> Section 80C: EPF /
+                        PPF Contribution</label>
                     <input type="number" class="input-field" id="epf_ppf" name="epf_ppf" placeholder="e.g., 70000">
 
-                    <label class="field-label" for="life_insurance"><i class="fa-solid fa-umbrella"></i> Section 80C: Life Insurance Premium</label>
-                    <input type="number" class="input-field" id="life_insurance" name="life_insurance" placeholder="e.g., 20000">
+                    <label class="field-label" for="life_insurance"><i class="fa-solid fa-umbrella"></i> Section 80C:
+                        Life Insurance Premium</label>
+                    <input type="number" class="input-field" id="life_insurance" name="life_insurance"
+                        placeholder="e.g., 20000">
 
-                    <label class="field-label" for="elss"><i class="fa-solid fa-chart-line"></i> Section 80C: ELSS Mutual Funds Investment</label>
+                    <label class="field-label" for="elss"><i class="fa-solid fa-chart-line"></i> Section 80C: ELSS
+                        Mutual Funds Investment</label>
                     <input type="number" class="input-field" id="elss" name="elss" placeholder="e.g., 50000">
 
-                    <label class="field-label" for="home_loan_principal"><i class="fa-solid fa-house-user"></i> Section 80C: Home Loan Principal Repayment</label>
-                    <input type="number" class="input-field" id="home_loan_principal" name="home_loan_principal" placeholder="e.g., 0">
+                    <label class="field-label" for="home_loan_principal"><i class="fa-solid fa-house-user"></i> Section
+                        80C: Home Loan Principal Repayment</label>
+                    <input type="number" class="input-field" id="home_loan_principal" name="home_loan_principal"
+                        placeholder="e.g., 0">
 
-                    <label class="field-label" for="tuition_fees"><i class="fa-solid fa-graduation-cap"></i> Section 80C: Children's Tuition Fees</label>
-                    <input type="number" class="input-field" id="tuition_fees" name="tuition_fees" placeholder="e.g., 0">
+                    <label class="field-label" for="tuition_fees"><i class="fa-solid fa-graduation-cap"></i> Section
+                        80C: Children's Tuition Fees</label>
+                    <input type="number" class="input-field" id="tuition_fees" name="tuition_fees"
+                        placeholder="e.g., 0">
 
-                    <label class="field-label" for="other_80c"><i class="fa-solid fa-box-archive"></i> Section 80C: Other Investments (NSC, etc.)</label>
+                    <label class="field-label" for="other_80c"><i class="fa-solid fa-box-archive"></i> Section 80C:
+                        Other Investments (NSC, etc.)</label>
                     <input type="number" class="input-field" id="other_80c" name="other_80c" placeholder="e.g., 10000">
-                    
-                    <label class="field-label" for="health_insurance_self"><i class="fa-solid fa-heart-pulse"></i> Section 80D: Health Insurance Premium (Self & Family)</label>
-                    <input type="number" class="input-field" id="health_insurance_self" name="health_insurance_self" placeholder="e.g., 25000">
 
-                    <label class="field-label" for="health_insurance_parents"><i class="fa-solid fa-user-plus"></i> Section 80D: Health Insurance Premium (Parents)</label>
-                    <input type="number" class="input-field" id="health_insurance_parents" name="health_insurance_parents" placeholder="e.g., 0">
+                    <label class="field-label" for="health_insurance_self"><i class="fa-solid fa-heart-pulse"></i>
+                        Section 80D: Health Insurance Premium (Self & Family)</label>
+                    <input type="number" class="input-field" id="health_insurance_self" name="health_insurance_self"
+                        placeholder="e.g., 25000">
 
-                    <label class="field-label" for="home_loan_interest"><i class="fa-solid fa-percent"></i> Section 24: Home Loan Interest Paid</label>
-                    <input type="number" class="input-field" id="home_loan_interest" name="home_loan_interest" placeholder="e.g., 0">
+                    <label class="field-label" for="health_insurance_parents"><i class="fa-solid fa-user-plus"></i>
+                        Section 80D: Health Insurance Premium (Parents)</label>
+                    <input type="number" class="input-field" id="health_insurance_parents"
+                        name="health_insurance_parents" placeholder="e.g., 0">
 
-                    <label class="field-label" for="education_loan_interest"><i class="fa-solid fa-book-open-reader"></i> Section 80E: Education Loan Interest Paid</label>
-                    <input type="number" class="input-field" id="education_loan_interest" name="education_loan_interest" placeholder="e.g., 0">
+                    <label class="field-label" for="home_loan_interest"><i class="fa-solid fa-percent"></i> Section 24:
+                        Home Loan Interest Paid</label>
+                    <input type="number" class="input-field" id="home_loan_interest" name="home_loan_interest"
+                        placeholder="e.g., 0">
 
-                    <label class="field-label" for="donations"><i class="fa-solid fa-hand-holding-heart"></i> Section 80G: Donations to Charity</label>
+                    <label class="field-label" for="education_loan_interest"><i
+                            class="fa-solid fa-book-open-reader"></i> Section 80E: Education Loan Interest Paid</label>
+                    <input type="number" class="input-field" id="education_loan_interest" name="education_loan_interest"
+                        placeholder="e.g., 0">
+
+                    <label class="field-label" for="donations"><i class="fa-solid fa-hand-holding-heart"></i> Section
+                        80G: Donations to Charity</label>
                     <input type="number" class="input-field" id="donations" name="donations" placeholder="e.g., 0">
-                    
+
+                    <label class="field-label" for="tds"><i class="fa-solid fa-scissors"></i> TDS (Tax Deducted at
+                        Source)</label>
+                    <input type="number" class="input-field" id="tds" name="tds" placeholder="e.g., 5000">
+
                     <div class="button">
                         <button type="submit">
                             <span class="shadow"></span>
@@ -87,4 +109,5 @@
 
 </body>
 <script src="{{ url_for('static', filename='pg1.js') }}"></script>
+
 </html>

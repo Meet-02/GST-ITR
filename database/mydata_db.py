@@ -117,6 +117,7 @@ def init_db():
         section_24_home_loan_interest_paid REAL,
         section_80e_education_loan_interest_paid REAL,
         section_80g_donations_charity REAL,
+        tds REAL,
         FOREIGN KEY(person_id) REFERENCES job_person(id)
     )
     ''')
