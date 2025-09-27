@@ -63,6 +63,65 @@ def init_db():
     )
     ''')
 
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS income_details (
+        detail_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        business_id INTEGER,
+        gross_income REAL,
+        other_income REAL,
+        FOREIGN KEY(business_id) REFERENCES businesses(id)
+    )
+    ''')
+
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS business_details (
+        business_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        business_name TEXT,
+        product_name TEXT,
+        purchase_value REAL,
+        gst_rate_purchase TEXT,
+        type_of_supply_purchase TEXT,
+        sell_value REAL,
+        gst_rate_sell TEXT,
+        type_of_supply_sell TEXT
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS job_details (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        person_id INTEGER,
+        financial_year TEXT,
+        basic_salary REAL,
+        hra_received REAL,
+        interest_savings REAL,
+        interest_fd REAL,
+        other_income REAL,
+        FOREIGN KEY(person_id) REFERENCES job_person(id)
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS job_deductions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        person_id INTEGER,
+        section_80c_epf_ppf REAL,
+        section_80c_life_insurance REAL,
+        section_80c_elss_mutual_funds REAL,
+        section_80c_home_loan_principal REAL,
+        section_80c_childrens_tuition REAL,
+        section_80c_other_investments REAL,
+        section_80d_health_insurance_self_family REAL,
+        section_80d_health_insurance_parents REAL,
+        section_24_home_loan_interest_paid REAL,
+        section_80e_education_loan_interest_paid REAL,
+        section_80g_donations_charity REAL,
+        FOREIGN KEY(person_id) REFERENCES job_person(id)
+    )
+    ''')
+
+
     conn.commit()
     conn.close()
     print(f"✅ All tables created successfully in {db_path}")

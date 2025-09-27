@@ -14,7 +14,8 @@
     <!-- Fixed Header -->
     <header id="header">
         <div class="logo-area">
-            <img src="{{ url_for('static', filename='IMAGES/Untitled__2_-removebg-preview.png') }}" alt="Header Photo" class="header-photo">
+            <img src="{{ url_for('static', filename='IMAGES/Untitled__2_-removebg-preview.png') }}" alt="Header Photo"
+                class="header-photo">
             <span>GST & ITR Portal</span>
         </div>
     </header>
@@ -30,8 +31,6 @@
         <div class="step" data-step="2">2</div>
         <div class="line"></div>
         <div class="step" data-step="3">3</div>
-        <div class="line"></div>
-        <div class="step" data-step="4">4</div>
     </div>
 
     <!-- Main Form -->
@@ -110,12 +109,19 @@
                     <option>Intra-State</option>
                     <option>Inter-State</option>
                 </select>
+                <div class="button">
+                    <button type="submit">
+                        <span class="shadow"></span>
+                        <span class="edge"></span>
+                        <span class="front text"> Submit</span>
+                    </button>
+                </div>
 
             </div>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='pg2.js') }}"></script>
+    <script src="{{ url_for('static', filename='pg1.js') }}"></script>
 </body>
 
 </html>

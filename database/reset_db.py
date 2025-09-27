@@ -16,6 +16,10 @@ def reset_db():
     cursor.execute("DELETE FROM people_info;")
     cursor.execute("DELETE FROM job_person;")
     cursor.execute("DELETE FROM businesses;")
+    cursor.execute("DELETE FROM income_details;")
+    cursor.execute("DELETE FROM business_details;")
+    cursor.execute("DELETE FROM job_details;")
+    cursor.execute("DELETE FROM job_deductions;")
 
     # Reset auto-increment counters
     cursor.execute("DELETE FROM sqlite_sequence;")

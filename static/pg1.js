@@ -64,3 +64,15 @@ function nextStep(current) {
         document.getElementById(`step-${next}`).classList.remove("hidden");
     }
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const sec80cInput = document.getElementById("sec80c");
+    const note = document.getElementById("note80c");
+
+    sec80cInput.addEventListener("focus", () => {
+        note.style.display = "block"; // show note
+    });
+
+    sec80cInput.addEventListener("blur", () => {
+        note.style.display = "none"; // hide note when focus is lost
+    });
+});

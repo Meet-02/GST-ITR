@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Tax Calculator - FinFigo</title>
+    <link rel="stylesheet" href="/static/job.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <header id="header">
+        <div class="logo-area">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png" alt="Logo">
+            <span>GST & ITR Portal</span>
+        </div>
+    </header>
+
+    <div class="banner">
+        <h1><i class="fa-solid fa-file-invoice-dollar"></i> Easy GST & ITR Filing</h1>
+        <p>Fill in your details to get started with a smooth and hassle-free process.</p>
+    </div>
+
+    <div class="stepper">
+        <div class="step active" data-step="1">1</div>
+        <div class="line"></div>
+        <div class="step" data-step="2">2</div>
+        <div class="line"></div>
+        <div class="step" data-step="3">3</div>
+    </div>
+    
+
+    <div class="outer-container">
+        <div class="content-container">
+            <div class="form-section">
+                <h1><i class="fa-solid fa-calculator"></i> Income Details for Tax Calculation</h1>
+
+                <form action="{{ url_for('jobdet') }}" method="POST">
+
+                    <label class="field-label" for="financial_year"><i class="fa-solid fa-calendar-days"></i> Financial
+                        Year <span class="asterisk">*</span></label>
+                    <select class="input-field" id="financial_year" name="financial_year">
+                        <option value="2025-26" selected>2025-26</option>
+                        <option value="2024-25">2024-25</option>
+                    </select>
+
+                    <label class="field-label" for="basic_salary"><i class="fa-solid fa-wallet"></i> Annual Basic Salary
+                        <span class="asterisk">*</span></label>
+                    <input type="number" class="input-field" id="basic_salary" name="basic_salary"
+                        placeholder="e.g., 1000000" required>
+
+                    <label class="field-label" for="hra_received"><i class="fa-solid fa-house-user"></i> Annual House
+                        Rent Allowance (HRA) Received</label>
+                    <input type="number" class="input-field" id="hra_received" name="hra_received"
+                        placeholder="e.g., 100000">
+
+                    <label class="field-label" for="savings_interest"><i class="fa-solid fa-building-columns"></i>
+                        Interest from Savings Accounts</label>
+                    <input type="number" class="input-field" id="savings_interest" name="savings_interest"
+                        placeholder="e.g., 8000">
+
+                    <label class="field-label" for="fd_interest"><i class="fa-solid fa-piggy-bank"></i> Interest from
+                        Fixed Deposits</label>
+                    <input type="number" class="input-field" id="fd_interest" name="fd_interest"
+                        placeholder="e.g., 20000">
+
+                    <label class="field-label" for="other_income"><i class="fa-solid fa-circle-plus"></i> Other
+                        Income</label>
+                    <input type="number" class="input-field" id="other_income" name="other_income"
+                        placeholder="e.g., 50000">
+
+                    <div class="button-container" style="text-align: center; margin-top: 30px;">
+                        <button type="next" class="next-button">Next <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script src="{{ url_for('static', filename='pg1.js') }}"></script>
+
+</html>

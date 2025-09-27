@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details - GST & ITR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='pg3.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Fixed Header -->
+    <header id="header">
+        <div class="logo-area">
+            <img src="{{ url_for('static', filename='IMAGES/Untitled_2-removebg-preview.png') }}" alt="Header Photo"
+                class="header-photo">
+            <span>GST & ITR Portal</span>
+        </div>
+    </header>
+
+    <!-- Page Background Banner -->
+    <div class="banner">
+        <h1><i class="fa-solid fa-file-invoice-dollar"></i> Easy GST & ITR Filing</h1>
+        <p>Fill in your details to get started with a smooth and hassle-free process.</p>
+    </div>
+    <div class="stepper">
+        <div class="step active" data-step="1">1</div>
+        <div class="line"></div>
+        <div class="step" data-step="2">2</div>
+        <div class="line"></div>
+        <div class="step" data-step="3">3</div>
+    </div>
+
+    <!-- Main Form -->
+    <div class="outer-container">
+        <div class="content-container">
+            <div class="form-section">
+                <h1><i class="fa-solid fa-user"></i>Bussiness expenses</h1>
+
+                <label class="field-label" for="rent"><i class="fa fa-solid home"></i> Rent <span
+                        class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="rent" maxlength="10" name="rent" required>
+
+                <label class="field-label" for="emp-w"><i class="fa-solid fa-user-group"></i>Employee Wage<span
+                        class="lead">(Total Amount)</span> <span class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="emp-w" maxlength="10" name="emp-w" required>
+
+                <label class="field-label" for="Bus-op"><i class="fa-solid fa-calendar"></i> Bussines operating
+                    expenses<span class="lead">(ex:-electric bill,phone bill)</span><span
+                        class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="Bus-op" name="Bus-op" required>
+
+                <label class="field-label" for="sec-80c"><i class="fa-solid fa-object-group"></i>Section 80C<span
+                        class="lead">(max-150000)</span> <span class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="pr-name" name="sec-80c" required>
+                <!-- Hidden Note -->
+                <div id="note80c" class="note hidden">
+                    📌 <b>Note for Section 80C</b><br>
+                    You can claim deductions up to <b>₹1,50,000 per year</b> under Section 80C for investments and
+                    expenses such as:
+                    <ul>
+                        <li>Life Insurance Premium (LIC, etc.)</li>
+                        <li>Employee Provident Fund (EPF/VPF)</li>
+                        <li>Public Provident Fund (PPF)</li>
+                        <li>Equity Linked Savings Scheme (ELSS)</li>
+                        <li>National Savings Certificate (NSC)</li>
+                        <li>5-Year Fixed Deposits (Tax Saver FDs)</li>
+                        <li>Tuition fees for children</li>
+                        <li>Principal repayment on home loan</li>
+                    </ul>
+                    <i>(Maximum deduction allowed = ₹1.5 lakh, even if your total investments are higher.)</i>
+                </div>
+
+
+                <label class="field-label" for="sec-80d"> <i class="fa fa-money-bill" aria-hidden="true"></i>Section 80D
+                    <span class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="sec-80d" maxlength="12" name="sec-80d" required>
+
+                <label class="field-label" for="sec-80d"> <i class="fa fa-money-bill" aria-hidden="true"></i>HRA
+                    <span class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="sec-80d" maxlength="12" name="sec-80d" required>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='pg1.js') }}"></script>
+</body>
+
+</html>
