@@ -1,7 +1,10 @@
 from flask import Flask, request, render_template, redirect, flash, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
-from calc import calc_job_tax_new_regime  
+from calc_job import calc_job_tax_new_regime  
+from calc_bus import calc_bus_tax_new_regime  
+from calc_gst import calculate_gst 
+from bus_pdf_gen import create_tax_report as create_business_report
 import os
 import re
 from flask import send_file
@@ -39,7 +42,7 @@ def business():
 
 @app.route('/details/Business/deduct')
 def bus_deduct():
-    return render_template("page3.html")
+    return render_template("buss_deduct.html")
 
 @app.route('/details/Job')
 def job_det():
@@ -165,27 +168,87 @@ def common_details():
 # BUSINESS DETAILS
 @app.route('/details/Business', methods=['POST'])
 def businessdet():
-    grin = request.form.get('gr-in')
-    othin = request.form.get('oth-in')
+    grin = get_float('gr-in')
+    othin = get_float('oth-in')
+    total_rev = get_float('total-revenue')
     Bus = request.form.get('Bus')
     prname = request.form.get('pr-name')
-    purprice = request.form.get('pur-price')
-    purgst = request.form.get('pur-gst')
+    purprice = get_float('pur-price')
+    purgst = get_float('pur-gst')
     tosp = request.form.get('tos-p')
-    salprice = request.form.get('sal-price')
-    sellgst = request.form.get('sell-gst')
+    salprice = get_float('sal-price')
+    sellgst = get_float('sell-gst')
     toss = request.form.get('tos-s')
 
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
 
-        cursor.execute('''INSERT INTO income_details(business_id, gross_income, other_income)
-        VALUES(?,?,?)''', (Bus, grin, othin))
+        cursor.execute('''INSERT INTO income_details(business_id, gross_income, other_income,Total_income)
+        VALUES(?,?,?,?)''', (Bus, grin, othin,total_rev))
 
         cursor.execute('''INSERT INTO business_details(business_id, business_name, product_name, purchase_value, gst_rate_purchase, type_of_supply_purchase, sell_value, gst_rate_sell, type_of_supply_sell)
         VALUES(?,?,?,?,?,?,?,?,?)''', (Bus, Bus, prname, purprice, purgst, tosp, salprice, sellgst, toss))
+        conn.commit()
 
+    session['business_income'] = {
+        'business_id': Bus,
+        'gross_income': grin,
+        'other_income': othin,
+        'total_income': total_rev
+    }
+
+    session['business_details'] = {
+        'business_id': Bus,
+        'business_name': Bus,
+        'product_name': prname,
+        'purchase_value': purprice,
+        'gst_rate_purchase': purgst,
+        'type_of_supply_purchase': tosp,
+        'sell_value': salprice,
+        'gst_rate_sell': sellgst,
+        'type_of_supply_sell': toss
+    }
+
+    flash("Business details submitted successfully!")
     return redirect(url_for("bus_deduct"))
+
+@app.route('/details/Business/deduct')
+def bussdeduct():
+    rent=get_float('rent')
+    emp_w=get_float('emp-w')
+    Bus_op=get_float('op-exp')
+    sub=get_float('sub')
+    oth=get_float('oth-expenses')
+    section80c=get_float('section-80c')
+    section80d=get_float('section-80d')
+    other_deduction=get_float('other-ded')
+
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+
+        cursor.execute('''
+        INSERT INTO business_expenses(rent, employee_wage, operating_expenses, subscription, other_expenses)
+        VALUES(?,?,?,?,?)''', (rent, emp_w, Bus_op, sub, oth))
+
+        cursor.execute('''
+        INSERT INTO finance_deduction(section_80c, section_80d, other_deduction)
+        VALUES(?,?,?)''', (section80c, section80d, other_deduction))
+        conn.commit()
+    
+    session['business_expenses'] = {   
+        'rent': rent,
+        'employee_wage': emp_w,
+        'operating_expenses': Bus_op,
+        'subscription': sub,
+        'other_expenses': oth
+    }
+
+    session['finance_deduction'] = {
+        'section_80c': section80c,
+        'section_80d': section80d,
+        'other_deduction': other_deduction
+    }
+    return redirect(url_for("bus_result"))
 
 
 # JOB DETAILS
@@ -274,6 +337,21 @@ def jobdeduct():
     flash("Job deductions submitted successfully!")
     return redirect(url_for("job_result"))
 
+@app.route('/details/Business/deduct/result')
+def bus_result():
+    bus_income=session.get('business_expenses', {})
+    bus_details=session.get('finance_deduction', {})
+
+    grin=business_expenses.get('gr-in', 0)
+    othin=business_expenses.get('oth-in', 0)
+    total_rev=business_expenses.get('total-revenue', 0)
+
+    gross_income=grin+othin+total_rev
+
+    total_tax,total_income=calc_bus_tax_new_regime(tax, gross_income)
+
+    return render_template("tax_result_bus.html", tax=total_tax, net_income=total_income, gross_income=gross_income)
+
 
 @app.route('/details/Job/deduct/result')
 def job_result():
@@ -296,16 +374,44 @@ def job_result():
 
     # 5. Pass the correct values to the template
     return render_template(
-        "tax_result.html", 
+        "tax_result_job.html", 
         tax=final_tax_due, 
         net_income=taxable_income, 
         gross_income=gross_income  
     )
 
-# Add sqlite3 import if it's not already at the top of app.py
-import sqlite3
+@app.route('/details/Business/deduct/result', methods=['POST'])
+def business_gst_result():
+    # 1. Get values from the form (no change here)
+    purchase_value = float(request.form.get('pur-price', 0))
+    purchase_gst_rate = int(request.form.get('pur-gst', 0))
+    purchase_supply_type = request.form.get('tos-p')
+    sell_value = float(request.form.get('sal-price', 0))
+    sell_gst_rate = int(request.form.get('sell-gst', 0))
+    sell_supply_type = request.form.get('tos-s')
 
-# ...
+    # 2. Call the full calculation function (no change here)
+    gst_results = calculate_gst(
+        purchase_value, 
+        purchase_gst_rate, 
+        purchase_supply_type, 
+        sell_value, 
+        sell_gst_rate, 
+        sell_supply_type
+    )
+
+    # 3. Prepare the simplified variables for the summary page
+    final_gst_payable = gst_results['net_payable']['total']
+    taxable_value = sell_value  # For GST, the taxable value is the sell value
+    net_income = sell_value - purchase_value # This is the profit/net income
+
+    # 4. Render the new 'gst_summary.html' template with the simplified data
+    return render_template(
+        'gst_summary.html',
+        final_gst_payable=final_gst_payable,
+        taxable_value=taxable_value,
+        net_income=net_income
+    )
 
 @app.route('/download-report')
 def download_report():
@@ -371,6 +477,83 @@ def download_report():
         pdf_buffer,
         as_attachment=True,
         download_name='Tax_Report.pdf',
+        mimetype='application/pdf'
+    )
+
+@app.route('/download-business-report')
+def download_business_report():
+    # 1. Check if all required session data exists
+    required_sessions = ['person_id', 'business_income', 'business_details', 'business_expenses', 'finance_deduction']
+    if not all(key in session for key in required_sessions):
+        flash("Session expired or data is incomplete. Please fill out the business forms again.")
+        return redirect(url_for('details'))
+
+    # 2. Gather data from all session variables
+    person_id = session.get('person_id')
+    bus_income = session.get('business_income', {})
+    bus_details = session.get('business_details', {})
+    bus_expenses = session.get('business_expenses', {})
+    fin_deductions = session.get('finance_deduction', {})
+
+    # 3. Fetch personal details from the database
+    personal_details = {}
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.row_factory = sqlite3.Row
+        user_data = cursor.execute("SELECT name, email, mobile_number FROM people_info WHERE id = ?", (person_id,)).fetchone()
+        if user_data:
+            personal_details = dict(user_data)
+    
+    # 4. Calculate Taxable Income using your business tax calculator
+    total_revenue = bus_income.get('total_income', 0)
+    total_expenses = sum(bus_expenses.values())
+    total_deductions = sum(fin_deductions.values())
+    
+    # Assuming calc_bus_tax_new_regime calculates and returns the final taxable income
+    # You may need to adjust the function call based on what calc_bus_tax_new_regime expects
+    taxable_income = calc_bus_tax_new_regime(total_revenue, total_expenses, total_deductions)
+
+    # 5. Assemble the complete data dictionary for the PDF
+    data_for_pdf = {
+        'personal': personal_details,
+        'income': {
+            'gross_income': bus_income.get('gross_income', 0),
+            'other_income': bus_income.get('other_income', 0),
+            'total_revenue': bus_income.get('total_income', 0),
+            'business_name': bus_details.get('business_name', 'N/A'),
+            'product_name': bus_details.get('product_name', 'N/A'),
+        },
+        'gst': {
+            'purchase_value': bus_details.get('purchase_value', 0),
+            'purchase_rate': bus_details.get('gst_rate_purchase', 0),
+            'purchase_supply_type': bus_details.get('type_of_supply_purchase', 'N/A'),
+            'sell_value': bus_details.get('sell_value', 0),
+            'sell_rate': bus_details.get('gst_rate_sell', 0),
+            'sell_supply_type': bus_details.get('type_of_supply_sell', 'N/A')
+        },
+        'expenses': {
+            'rent': bus_expenses.get('rent', 0),
+            'wages': bus_expenses.get('employee_wage', 0),
+            'operating_expenses': bus_expenses.get('operating_expenses', 0),
+            'subscription': bus_expenses.get('subscription', 0),
+            'other': bus_expenses.get('other_expenses', 0),
+            '80c': fin_deductions.get('section_80c', 0),
+            '80d': fin_deductions.get('section_80d', 0),
+            'other_deductions': fin_deductions.get('other_deduction', 0)
+        },
+        'summary': {
+            'taxable_income': taxable_income
+        }
+    }
+    
+    # 6. Generate the PDF in memory
+    pdf_buffer = create_business_report(data_for_pdf)
+
+    # 7. Send the PDF file to the user for download
+    return send_file(
+        pdf_buffer,
+        as_attachment=True,
+        download_name='Business_Tax_Report.pdf',
         mimetype='application/pdf'
     )
 

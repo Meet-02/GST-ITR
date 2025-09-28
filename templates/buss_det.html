@@ -46,6 +46,14 @@
                 <label class="field-label" for="oth-in"><i class="fa-solid fa-user-group"></i> Other income source <span
                         class="lead">(Total Amount)</span> <span class="asterisk">*</span></label>
                 <input type="number" class="input-field" id="oth-in" maxlength="10" name="oth-in" required>
+
+                <label class="field-label" for="total-revenue">
+                    <i class="fa-solid fa-calculator"></i> Total Revenue
+                </label>
+                <input type="number" class="input-field" id="total-revenue" name="total-rev" readonly
+                    style="background-color: #f0f0f0; font-weight: bold;">
+
+                    
                 <h1><i class="fa-solid fa-user"></i> Bussiness Details</h1>
 
                 <label class="field-label" for="Bus"><i class="fa-solid fa-calendar"></i> Bussines name <span
@@ -81,8 +89,8 @@
                         class="lead">(according to purchase)</span> <span class="asterisk">*</span></label>
                 <select class="input-field" id="tos-p" name="tos-p" required>
                     <option value="" selected disabled>Select</option>
-                    <option>Intra-State</option>
-                    <option>Inter-State</option>
+                    <option value="Intra-State">Intra-State</option>
+                    <option value="Inter-State">Inter-State</option>
                 </select>
 
                 <label class="field-label" for="sal-price"> <i class="fa fa-money-bill" aria-hidden="true"></i>SELL
@@ -106,15 +114,11 @@
                         class="lead">(according to selling)</span> <span class="asterisk">*</span></label>
                 <select class="input-field" id="tos-s" name="tos-s" required>
                     <option value="" selected disabled>Select</option>
-                    <option>Intra-State</option>
-                    <option>Inter-State</option>
+                    <option value="Intra-State">Intra-State</option>
+                    <option value="Inter-State">Inter-State</option>
                 </select>
-                <div class="button">
-                    <button type="submit">
-                        <span class="shadow"></span>
-                        <span class="edge"></span>
-                        <span class="front text"> Submit</span>
-                    </button>
+                <div class="button-container">
+                    <button type="submit" class="submit-button">Submit</button>
                 </div>
 
             </div>

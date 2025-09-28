@@ -12,8 +12,8 @@ cursor = conn.cursor()
 
 try:
     # This command adds the 'tds' column if it doesn't exist
-    cursor.execute("ALTER TABLE job_deductions ADD COLUMN tds REAL;")
-    print("✅ Column 'tds' added successfully!")
+    cursor.execute("ALTER TABLE income_details ADD COLUMN Total_revenue REAL;")
+    print("✅ Column 'Total_revenue' added successfully!")
 except sqlite3.OperationalError as e:
     # This will catch errors, including if the column already exists
     print(f"⚠️  Error: {e}")

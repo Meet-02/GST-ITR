@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details - GST & ITR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='pg2.css') }}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+    <header id="header">
+        <div class="logo-area">
+            <img src="{{ url_for('static', filename='IMAGES/Untitled_2-removebg-preview.png') }}" alt="Header Photo"
+                class="header-photo">
+            <span>GST & ITR Portal</span>
+        </div>
+    </header>
+
+    <div class="banner">
+        <h1><i class="fa-solid fa-file-invoice-dollar"></i> Easy GST & ITR Filing</h1>
+        <p>Fill in your details to get started with a smooth and hassle-free process.</p>
+    </div>
+    <div class="stepper">
+        <div class="step active" data-step="1">1</div>
+        <div class="line"></div>
+        <div class="step" data-step="2">2</div>
+        <div class="line"></div>
+        <div class="step" data-step="3">3</div>
+        <div class="line"></div>
+        <div class="step" data-step="4">4</div>
+    </div>
+
+    <div class="outer-container">
+        <div class="content-container">
+            <div class="form-section">
+                <h1><i class="fa-solid fa-user"></i> Business Expenses</h1>
+
+                <label class="field-label" for="rent"><i class="fa-solid fa-house-user"></i> Rent <span
+                        class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="rent" maxlength="10" name="rent">
+
+                <label class="field-label" for="emp-w"><i class="fa-solid fa-user-group"></i> Employee Wage<span
+                        class="lead">(Total Amount)</span> <span class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="emp-w" maxlength="10" name="emp-w">
+
+                <label class="field-label" for="Bus-op"><i class="fa-solid fa-calendar"></i> Business operating
+                    expenses<span class="lead">(ex:-electric bill,phone bill)</span><span
+                        class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="Bus-op" name="Bus-op">
+                
+              <div class="tooltip-container">
+                    <label class="field-label" for="gross-income">
+                        <i class="fa-solid fa-id-badge"></i> Subscription
+                        <span class="asterisk">*</span>
+                    </label>
+                    <span class="tooltip-text">if u have bought any subscribed software</span>
+                </div>
+                <input type="number" class="input-field" id="gross-income" name="sub" required>
+                
+                <label class="field-label" for="other-expenses"><i class="fa-solid fa-plus"></i> Other expenses <span
+                    class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="other-expenses" name="other-expenses">
+
+
+                <hr style="margin: 30px 0;">
+
+                <h1><i class="fa-solid fa-hand-holding-dollar"></i> Finance Deduction</h1>
+
+                <label class="field-label" for="section80c"><i class="fa-solid fa-file-invoice"></i> Section 80C <span
+                    class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="section80c" name="section80c">
+
+                <label class="field-label" for="section80d"><i class="fa-solid fa-notes-medical"></i> Section 80D <span
+                    class="asterisk">*</span></label>
+                <input type="number" class="input-field" id="section80d" name="section80d">
+
+                 <div class="tooltip-container">
+                    <label class="field-label" for="gross-income">
+                        <i class="fa-solid fa-id-badge"></i> Other deductions(Total deduction)
+                        <span class="asterisk">*</span>
+                    </label>
+                    <span class="tooltip-text">The sum of all other deduction(insurances taken)</span>
+                </div>
+                <input type="number" class="input-field" id="gross-income" name="other-ded" required>
+                <div class="button">
+                    <button type="submit">
+                        <span class="shadow"></span>
+                        <span class="edge"></span>
+                        <span class="front text"> Calculate Tax </span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='pg1.js') }}"></script>
+</body>
+
+</html>

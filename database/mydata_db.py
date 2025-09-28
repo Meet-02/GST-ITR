@@ -69,6 +69,7 @@ def init_db():
         business_id INTEGER,
         gross_income REAL,
         other_income REAL,
+        Total_revenue REAL,
         FOREIGN KEY(business_id) REFERENCES businesses(id)
     )
     ''')
@@ -87,6 +88,25 @@ def init_db():
         type_of_supply_sell TEXT
     )
     ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS business_expenses (
+        rent REAL,
+        employee_wage REAL,
+        operating_expenses REAL,
+        subscription REAL,
+        other_expenses REAL
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS finance_deduction (
+        section_80c REAL,
+        section_80d REAL,
+        other_deduction REAL
+    )
+    ''')
+
 
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS job_details (

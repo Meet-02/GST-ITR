@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Summary</title>
+    <style>
+        /* Main page styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eaf2ff;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Vertically center the container */
+            min-height: 100vh;
+        }
+
+        .summary-card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #dce8f6;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px 40px;
+        }
+
+        .card-header { 
+            text-align: center;
+            gap: 12px; 
+            margin-bottom: 25px; 
+            color: #003366; 
+        }
+        .card-header h1 { 
+            font-size: 1.8em; 
+            margin: 0; 
+        }
+        
+        .result-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-size: 1.1em; 
+            padding: 18px 10px; 
+            background-color: #f8faff; 
+            border: 1px solid #e0e9f5; 
+            border-radius: 6px; 
+            margin-bottom: 12px; 
+        }
+        .result-label { 
+            color: #555; 
+            font-weight: 500; 
+        }
+        .result-value { 
+            font-weight: bold; 
+            color: #003366; 
+            font-size: 1.2em; 
+        }
+        
+        .final-total {
+            background-color: #e6ffed; /* Light green highlight */
+        }
+        .final-total .result-value {
+             color: #155724;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="summary-card">
+
+        <div class="card-header">
+            <h1>Key Financial Summary</h1>
+        </div>
+        
+        <div class="result-item">
+            <span class="result-label">Taxable Value (Sell Value):</span>
+            <span class="result-value">₹{{ taxable_value | round(2) }}</span>
+        </div>
+
+        <div class="result-item">
+            <span class="result-label">Net Income (Profit):</span>
+            <span class="result-value">₹{{ net_income | round(2) }}</span>
+        </div>
+
+        <div class="result-item final-total">
+            <span class="result-label">Final GST to Pay:</span>
+            <span class="result-value">₹{{ final_gst_payable | round(2) }}</span>
+        </div>
+
+        <div class="download-area">
+            <a href="{{ url_for('download_business_report') }}" class="download-btn">Download Full Report</a>
+        </div>
+
+    </div>
+</body>
+</html>

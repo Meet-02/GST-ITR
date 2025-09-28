@@ -20,7 +20,7 @@ body {
     align-items: center;
     width: 95%;
     border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 #header img {
@@ -63,14 +63,17 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
 .banner h1 {
     margin: 0;
     font-size: 2rem;
 }
+
 .banner p {
     margin-top: 0.5rem;
     font-size: 1rem;
 }
+
 /* stepper progress */
 .stepper {
     display: flex;
@@ -81,6 +84,7 @@ body {
     width: 70%;
     padding-left: 16rem;
 }
+
 .step {
     width: 35px;
     height: 35px;
@@ -94,15 +98,18 @@ body {
     color: #2a3a8d;
     transition: all 0.3s ease;
 }
+
 .step.completed {
     background: #2a3a8d;
     color: white;
 }
+
 .line {
     flex: 1;
     height: 3px;
     background: #ccc;
 }
+
 .hidden {
     display: none;
 }
@@ -113,22 +120,26 @@ body {
     justify-content: center;
     padding: 3rem 1rem;
 }
+
 .content-container {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     padding: 2rem;
     width: 100%;
     max-width: 700px;
 }
+
 .form-section h1 {
     color: #2a3a8d;
     margin-bottom: 1.5rem;
 }
+
 .field-label i {
     margin-right: 8px;
     color: #2a3a8d;
 }
+
 .input-field {
     width: 100%;
     padding: 10px;
@@ -136,10 +147,12 @@ body {
     border-radius: 6px;
     border: 1px solid #ccc;
 }
+
 .input-field:focus {
     border-color: #2a3a8d;
     outline: none;
 }
+
 .section-title {
     font-weight: bold;
     margin-top: 20px;
@@ -154,12 +167,13 @@ body {
     background: #f4f6fc;
 }
 
-.lead{
+.lead {
     font-size: 12px;
     padding: 3px;
     font-style: italic;
 }
-.asterisk{
+
+.asterisk {
     color: red;
 }
 
@@ -169,14 +183,17 @@ body {
         flex-direction: column;
         gap: 0.5rem;
     }
+
     .banner {
         font-size: 0.9rem;
     }
-    .stepper{
+
+    .stepper {
         padding-left: 2.5rem;
         width: 80%;
     }
 }
+
 button {
     position: relative;
     border: none;
@@ -187,12 +204,13 @@ button {
     transition: filter 250ms;
     user-select: none;
     touch-action: manipulation;
-   }
-.button{
+}
+
+.button {
     padding-top: 4rem;
 }
-   
-   .shadow {
+
+.shadow {
     position: absolute;
     top: 0;
     left: 0;
@@ -202,28 +220,24 @@ button {
     background: hsl(0deg 0% 0% / 0.25);
     will-change: transform;
     transform: translateY(2px);
-    transition: transform
-       600ms
-       cubic-bezier(.3, .7, .4, 1);
-   }
-   
-   .edge {
+    transition: transform 600ms cubic-bezier(.3, .7, .4, 1);
+}
+
+.edge {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     border-radius: 12px;
-    background: linear-gradient(
-       to left,
-       hsl(340deg 100% 16%) 0%,
-       hsl(340deg 100% 32%) 8%,
-       hsl(340deg 100% 32%) 92%,
-       hsl(340deg 100% 16%) 100%
-     );
-   }
-   
-   .front {
+    background: linear-gradient(to left,
+            hsl(340deg 100% 16%) 0%,
+            hsl(340deg 100% 32%) 8%,
+            hsl(340deg 100% 32%) 92%,
+            hsl(340deg 100% 16%) 100%);
+}
+
+.front {
     display: block;
     position: relative;
     padding: 12px 27px;
@@ -233,39 +247,160 @@ button {
     background: hsl(345deg 100% 47%);
     will-change: transform;
     transform: translateY(-4px);
-    transition: transform
-       600ms
-       cubic-bezier(.3, .7, .4, 1);
-   }
-   
-   button:hover {
+    transition: transform 600ms cubic-bezier(.3, .7, .4, 1);
+}
+
+button:hover {
     filter: brightness(110%);
-   }
-   
-   button:hover .front {
+}
+
+button:hover .front {
     transform: translateY(-6px);
-    transition: transform
-       250ms
-       cubic-bezier(.3, .7, .4, 1.5);
-   }
-   
-   button:active .front {
+    transition: transform 250ms cubic-bezier(.3, .7, .4, 1.5);
+}
+
+button:active .front {
     transform: translateY(-2px);
     transition: transform 34ms;
-   }
-   
-   button:hover .shadow {
+}
+
+button:hover .shadow {
     transform: translateY(4px);
-    transition: transform
-       250ms
-       cubic-bezier(.3, .7, .4, 1.5);
-   }
-   
-   button:active .shadow {
+    transition: transform 250ms cubic-bezier(.3, .7, .4, 1.5);
+}
+
+button:active .shadow {
     transform: translateY(1px);
     transition: transform 34ms;
-   }
-   
-   button:focus:not(:focus-visible) {
+}
+
+button:focus:not(:focus-visible) {
     outline: none;
-   }
+}
+
+/* Base styles for the button */
+.next-button {
+    /* Font and Text */
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+
+    /* Background and Shape */
+    background-color: #007bff;
+    /* A nice, standard blue */
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+
+    /* Behavior and Effects */
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+
+    /* Icon and Text Alignment */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    /* Space between "Next" and the arrow */
+}
+
+/* Hover effect for when the mouse is over the button */
+.next-button:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    /* Makes the button lift slightly */
+}
+
+/* Active effect for when the button is being clicked */
+.next-button:active {
+    background-color: #004494;
+    /* Even darker blue when clicked */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(0);
+    /* Resets the lift effect */
+}
+
+/* stepper progress */
+.stepper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #fff;
+    position: relative;
+}
+
+.step.active {
+    background: #007bff;
+    /* Blue for active */
+}
+
+.step.completed {
+    background: #28a745;
+    /* Green for completed */
+}
+
+.line {
+    width: 21rem;
+    height: 3px;
+    background: #ddd;
+}
+
+.step.completed+.line {
+    background: #28a745;
+    /* Green line after completed */
+}
+
+/* Responsive styles for screens smaller than 768px */
+@media (max-width: 768px) {
+    .step {
+        width: 30px;
+        /* Correctly shrunk size */
+        height: 30px;
+        font-size: 0.8rem;
+        /* smaller font inside */
+    }
+
+    .line {
+        width: 30px;
+        /* shorten the connector line */
+    }
+}
+.button-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.submit-button {
+    background-color: #0d6efd; /* A modern blue */
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+.submit-button:hover {
+    background-color: #0b5ed7; /* A darker blue for hover */
+}
+
+.submit-button:active {
+    transform: scale(0.98); /* Slight shrink effect on click */
+}

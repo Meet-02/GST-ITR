@@ -76,3 +76,26 @@ document.addEventListener("DOMContentLoaded", () => {
         note.style.display = "none"; // hide note when focus is lost
     });
 });
+
+// Add this JavaScript to make the calculation work
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Get the input fields
+    const grossIncomeInput = document.getElementById('gr-in');
+    const otherIncomeInput = document.getElementById('oth-in');
+    const totalRevenueInput = document.getElementById('total-revenue');
+
+    // 2. Create a function to update the total
+    function updateTotalRevenue() {
+        const grossIncome = parseFloat(grossIncomeInput.value) || 0;
+        const otherIncome = parseFloat(otherIncomeInput.value) || 0;
+        
+        const total = grossIncome + otherIncome;
+        
+        totalRevenueInput.value = total;
+    }
+
+    // 3. Add event listeners to the input fields
+    grossIncomeInput.addEventListener('input', updateTotalRevenue);
+    otherIncomeInput.addEventListener('input', updateTotalRevenue);
+});
