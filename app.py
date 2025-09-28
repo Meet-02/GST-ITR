@@ -1,8 +1,11 @@
-from flask import Flask, request, render_template, redirect, flash, url_for
+from flask import Flask, request, render_template, redirect, flash, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
+from calc import calc_job_tax_new_regime  
 import os
 import re
+from flask import send_file
+from pdf_gen import create_tax_report
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -10,6 +13,13 @@ app.secret_key = 'your_secret_key_here'
 # Absolute base dir
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, 'database/mydata.db')
+
+# helper to safely convert
+def get_float(key):
+    try:
+        return float(request.form.get(key, 0) or 0)
+    except ValueError:
+        return 0
 
 @app.route('/')
 def landing():
@@ -119,6 +129,8 @@ def common_details():
         ''', (Name, Father, DOB, Gender, Email, Aadhar, Mobile))
 
         person_id = cursor.lastrowid
+        
+        session['person_id'] = person_id 
 
         if category == "Job Person":
             employer_category = request.form.get('empc')
@@ -141,7 +153,6 @@ def common_details():
         conn.commit()
         flash("Details submitted successfully!")
 
-        flash("Details submitted successfully!")
         if category == "Business Person":
             return redirect(url_for("business"))
         elif category == "Job Person":
@@ -149,7 +160,6 @@ def common_details():
         else:
             flash("Please select a valid category")
             return redirect(url_for("details"))
-
 
 
 # BUSINESS DETAILS
@@ -181,51 +191,188 @@ def businessdet():
 # JOB DETAILS
 @app.route('/details/Job', methods=['POST'])
 def jobdet():
-    fin_y = float(request.form.get('financial_year', 0))
-    bas_sal = float(request.form.get('basic_salary', 0))
-    hra_rec = float(request.form.get('hra_received', 0))
-    sav_int = float(request.form.get('saving_interest', 0))
-    fd_int =float(request.form.get('fd_interest', 0))
-    oth_inc = float(request.form.get('other_income', 0))
+    fin_y = request.form.get('financial_year')
+    bas_sal = get_float('basic_salary')
+    hra_rec = get_float('hra_received')
+    sav_int = get_float('savings_interest')
+    fd_int = get_float('fd_interest')
+    oth_inc = get_float('other_income')
 
+    # ✅ Save in DB
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute('''
-        INSERT INTO job_details(financial_year, basic_salary, hra_received, interest_savings, interest_fd, other_income)
-        VALUES(?,?,?,?,?,?)
+            INSERT INTO job_details(financial_year, basic_salary, hra_received, interest_savings, interest_fd, other_income)
+            VALUES(?,?,?,?,?,?)
         ''', (fin_y, bas_sal, hra_rec, sav_int, fd_int, oth_inc))
+        conn.commit()
+
+    # ✅ Also save in session
+    session['job_income'] = {
+        'financial_year': fin_y,
+        'basic_salary': bas_sal,
+        'hra_received': hra_rec,
+        'savings_interest': sav_int,
+        'fd_interest': fd_int,
+        'other_income': oth_inc
+    }
 
     flash("Job details submitted successfully!")
     return redirect(url_for("job_deduct"))
 
 
+
+
 # JOB DEDUCTIONS
 @app.route('/details/Job/deduct', methods=['POST'])
 def jobdeduct():
-    epf_ppf = float(request.form.get('epf_ppf', 0))
-    life_ins = float(request.form.get('life_insurance', 0))
-    elss = float(request.form.get('elss', 0))
-    home_loan_principal = float(request.form.get('home_loan_principal', 0))
-    tuition = float(request.form.get('tuition_fees', 0))
-    other_80c = float(request.form.get('other_80c', 0))
-    health_ins_self = float(request.form.get('health_insurance_self', 0))
-    health_ins_parents = float(request.form.get('health_insurance_parents', 0))
-    home_loan_interest = float(request.form.get('home_loan_interest', 0))
-    education_loan = float(request.form.get('education_loan_interest', 0))
-    donations = float(request.form.get('donations', 0))
-    tds = float(request.form.get('tds', 0))
+    epf_ppf = get_float('epf_ppf')
+    life_ins = get_float('life_insurance')
+    elss = get_float('elss')
+    home_loan_principal = get_float('home_loan_principal')
+    tuition = get_float('tuition_fees')
+    other_80c = get_float('other_80c')
+    health_ins_self = get_float('health_insurance_self')
+    health_ins_parents = get_float('health_insurance_parents')
+    home_loan_interest = get_float('home_loan_interest')
+    education_loan = get_float('education_loan_interest')
+    donations = get_float('donations')
+    tds = get_float('tds')
 
-
+    # ✅ Save in DB
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute('''
-        INSERT INTO job_deductions(section_80c_epf_ppf, section_80c_life_insurance, section_80c_elss_mutual_funds, section_80c_home_loan_principal, section_80c_childrens_tuition, section_80c_other_investments,
-        section_80d_health_insurance_self_family, section_80d_health_insurance_parents, section_24_home_loan_interest_paid, section_80e_education_loan_interest_paid, section_80g_donations_charity,tds)
-        VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
-        ''', (epf_ppf, life_ins, elss, home_loan_principal, tuition, other_80c, health_ins_self, health_ins_parents, home_loan_interest, education_loan, donations,tds))
+            INSERT INTO job_deductions(
+                section_80c_epf_ppf, section_80c_life_insurance, section_80c_elss_mutual_funds,
+                section_80c_home_loan_principal, section_80c_childrens_tuition, section_80c_other_investments,
+                section_80d_health_insurance_self_family, section_80d_health_insurance_parents,
+                section_24_home_loan_interest_paid, section_80e_education_loan_interest_paid,
+                section_80g_donations_charity, tds
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+        ''', (epf_ppf, life_ins, elss, home_loan_principal, tuition,
+              other_80c, health_ins_self, health_ins_parents,
+              home_loan_interest, education_loan, donations, tds))
+        conn.commit()
 
-        return redirect(url_for("index"))
+    # ✅ Also save in session
+    session['job_deductions'] = {
+        'epf_ppf': epf_ppf,
+        'life_ins': life_ins,
+        'elss': elss,
+        'home_loan_principal': home_loan_principal,
+        'tuition': tuition,
+        'other_80c': other_80c,
+        'health_ins_self': health_ins_self,
+        'health_ins_parents': health_ins_parents,
+        'home_loan_interest': home_loan_interest,
+        'education_loan': education_loan,
+        'donations': donations,
+        'tds': tds
+    }
 
+    flash("Job deductions submitted successfully!")
+    return redirect(url_for("job_result"))
+
+
+@app.route('/details/Job/deduct/result')
+def job_result():
+    job_income = session.get('job_income', {})
+    job_deductions = session.get('job_deductions', {})
+
+    bas_sal = job_income.get('basic_salary', 0)
+    hra_rec = job_income.get('hra_received', 0)
+    sav_int = job_income.get('savings_interest', 0)
+    fd_int = job_income.get('fd_interest', 0)
+    oth_inc = job_income.get('other_income', 0)
+    
+
+    tds = job_deductions.get('tds', 0)
+
+    gross_income = bas_sal + hra_rec + sav_int + fd_int + oth_inc
+
+
+    final_tax_due, taxable_income = calc_job_tax_new_regime(gross_income, tds)
+
+    # 5. Pass the correct values to the template
+    return render_template(
+        "tax_result.html", 
+        tax=final_tax_due, 
+        net_income=taxable_income, 
+        gross_income=gross_income  
+    )
+
+# Add sqlite3 import if it's not already at the top of app.py
+import sqlite3
+
+# ...
+
+@app.route('/download-report')
+def download_report():
+    # Check for all required data
+    if 'person_id' not in session or 'job_income' not in session or 'job_deductions' not in session:
+        flash("Session expired or data not found. Please calculate your tax again.")
+        return redirect(url_for('job_det'))
+
+    # --- NEW: Fetch Personal Details from DB ---
+    person_id = session.get('person_id')
+    personal_details = {}
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.row_factory = sqlite3.Row # This allows accessing columns by name
+        user_data = cursor.execute("SELECT name, email, mobile_number FROM people_info WHERE id = ?", (person_id,)).fetchone()
+        if user_data:
+            personal_details = dict(user_data)
+    # --------------------------------------------
+
+    job_income = session.get('job_income', {})
+    job_deductions = session.get('job_deductions', {})
+
+    gross_income = (
+        job_income.get('basic_salary', 0) +
+        job_income.get('hra_received', 0) +
+        job_income.get('savings_interest', 0) +
+        job_income.get('fd_interest', 0) +
+        job_income.get('other_income', 0)
+    )
+    
+    taxable_income = gross_income - 50000
+    final_tax_due, _ = calc_job_tax_new_regime(gross_income, job_deductions.get('tds', 0))
+    
+    # ... (your existing tax calculation logic for the PDF summary) ...
+    base_tax = 0
+    if taxable_income > 300000:
+       if taxable_income > 1500000: base_tax = (taxable_income - 1500000) * 0.30 + 150000
+       elif taxable_income > 1200000: base_tax = (taxable_income - 1200000) * 0.20 + 90000
+       elif taxable_income > 900000: base_tax = (taxable_income - 900000) * 0.15 + 45000
+       elif taxable_income > 600000: base_tax = (taxable_income - 600000) * 0.10 + 15000
+       else: base_tax = (taxable_income - 300000) * 0.05
+    total_tax = base_tax * 1.04
+
+
+    # --- UPDATED: Add personal_details to the data dictionary ---
+    data_for_pdf = {
+        'personal': personal_details, # Pass the fetched personal details
+        'financial_year': job_income.get('financial_year', 'N/A'),
+        'income': job_income,
+        'summary': {
+            'gross_income': gross_income,
+            'standard_deduction': 50000,
+            'taxable_income': taxable_income,
+            'total_tax': round(total_tax, 2),
+            'tds': job_deductions.get('tds', 0),
+            'final_tax_due': round(final_tax_due, 2)
+        }
+    }
+    
+    pdf_buffer = create_tax_report(data_for_pdf)
+
+    return send_file(
+        pdf_buffer,
+        as_attachment=True,
+        download_name='Tax_Report.pdf',
+        mimetype='application/pdf'
+    )
 
 # FINAL OUTPUT
 @app.route('/index')
