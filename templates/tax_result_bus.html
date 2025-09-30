@@ -3,97 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GST Summary</title>
+    <title>Business Tax Result</title>
     <style>
-        /* Main page styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #eaf2ff;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center; /* Vertically center the container */
-            min-height: 100vh;
-        }
-
-        .summary-card {
-            background-color: #ffffff;
-            border-radius: 8px;
-            border: 1px solid #dce8f6;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            max-width: 500px;
-            padding: 30px 40px;
-        }
-
-        .card-header { 
-            text-align: center;
-            gap: 12px; 
-            margin-bottom: 25px; 
-            color: #003366; 
-        }
-        .card-header h1 { 
-            font-size: 1.8em; 
-            margin: 0; 
-        }
-        
-        .result-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            font-size: 1.1em; 
-            padding: 18px 10px; 
-            background-color: #f8faff; 
-            border: 1px solid #e0e9f5; 
-            border-radius: 6px; 
-            margin-bottom: 12px; 
-        }
-        .result-label { 
-            color: #555; 
-            font-weight: 500; 
-        }
-        .result-value { 
-            font-weight: bold; 
-            color: #003366; 
-            font-size: 1.2em; 
-        }
-        
-        .final-total {
-            background-color: #e6ffed; /* Light green highlight */
-        }
-        .final-total .result-value {
-             color: #155724;
-        }
-
+        /* (Using the same styles as your job_result.html for consistency) */
+        body { font-family: Arial, sans-serif; background-color: #eaf2ff; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .page-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .tax-card { background-color: #ffffff; border-radius: 8px; border: 1px solid #dce8f6; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); width: 100%; max-width: 550px; padding: 30px 40px; }
+        .stepper { position: relative; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 550px; margin-bottom: 25px; }
+        .stepper::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background-color: #e5e7eb; transform: translateY(-50%); z-index: 0; }
+        .stepper-progress { position: absolute; top: 50%; left: 0; height: 4px; background-color: #28a745; width: 100%; transform: translateY(-50%); z-index: 1; }
+        .step { width: 32px; height: 32px; border-radius: 50%; background-color: #e5e7eb; color: #6b7280; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 2; }
+        .step.completed { background-color: #28a745; color: white; }
+        .step.active { background-color: #0d6efd; color: white; }
+        .card-header { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 25px; color: #003366; }
+        .card-header h1 { font-size: 1.8em; margin: 0; }
+        .card-header .icon { font-size: 1.6em; }
+        .result-item { display: flex; justify-content: space-between; align-items: center; font-size: 1.1em; padding: 18px 10px; background-color: #f8faff; border: 1px solid #e0e9f5; border-radius: 6px; margin-bottom: 12px; }
+        .result-label { color: #555; font-weight: 500; }
+        .result-value { font-weight: bold; color: #003366; font-size: 1.2em; }
+        .download-area { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e9f5; }
+        .download-btn { display: inline-block; background-color: #28a745; color: #ffffff; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; font-size: 1em; }
     </style>
 </head>
 <body>
-    <div class="summary-card">
-
-        <div class="card-header">
-            <h1>Key Financial Summary</h1>
+    <div class="page-container">
+        <div class="stepper">
+            <div class="stepper-progress"></div>
+            <div class="step completed">1</div>
+            <div class="step completed">2</div>
+            <div class="step completed">3</div>
         </div>
-        
-        <div class="result-item">
-            <span class="result-label">Taxable Value (Sell Value):</span>
-            <span class="result-value">₹{{ taxable_value | round(2) }}</span>
-        </div>
+        <div class="tax-card">
+            <div class="card-header">
+                <span class="icon">🧾</span>
+                <h1>Your Tax Calculation</h1>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Gross Income (Revenue):</span>
+                <span class="result-value">₹{{ gross_income }}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Net Taxable Income (ITR):</span>
+                <span class="result-value">₹{{ net_taxable_income }}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">GST Payable:</span>
+                <span class="result-value">₹{{ gst_payable }}</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Final Income Tax Payable:</span>
+                <span class="result-value">₹{{ final_tax_payable }}</span>
+            </div>
 
-        <div class="result-item">
-            <span class="result-label">Net Income (Profit):</span>
-            <span class="result-value">₹{{ net_income | round(2) }}</span>
+            <div class="download-area">
+                <a href="{{ url_for('download_business_report') }}" class="download-btn">Download as PDF</a>
+            </div>
         </div>
-
-        <div class="result-item final-total">
-            <span class="result-label">Final GST to Pay:</span>
-            <span class="result-value">₹{{ final_gst_payable | round(2) }}</span>
-        </div>
-
-        <div class="download-area">
-            <a href="{{ url_for('download_business_report') }}" class="download-btn">Download Full Report</a>
-        </div>
-
     </div>
 </body>
 </html>

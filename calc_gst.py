@@ -69,21 +69,23 @@ def calculate_gst(purchase_value, purchase_gst_rate, purchase_supply_type, sell_
 
     net_gst_payable = payable_cgst + payable_sgst + payable_igst
 
-    # --- 4. Prepare results in a dictionary for easy display ---
     results = {
         "input_tax": {
             "total": input_tax_total,
-            "cgst": input_cgst + setoff if purchase_supply_type == 'Intra-State' else 0,
-            "sgst": input_sgst + setoff if purchase_supply_type == 'Intra-State' else 0,
-            "igst": input_igst + setoff if purchase_supply_type == 'Inter-State' else 0,
+            # FIX: Use the original calculated values, not "input_cgst + setoff"
+            "cgst": input_tax_total / 2 if purchase_supply_type == 'Intra-State' else 0,
+            "sgst": input_tax_total / 2 if purchase_supply_type == 'Intra-State' else 0,
+            "igst": input_tax_total if purchase_supply_type == 'Inter-State' else 0,
         },
         "output_tax": {
+            # ... (this part was already correct) ...
             "total": output_tax_total,
             "cgst": output_cgst,
             "sgst": output_sgst,
             "igst": output_igst,
         },
         "net_payable": {
+            # ... (this part was already correct) ...
             "total": net_gst_payable,
             "cgst": payable_cgst,
             "sgst": payable_sgst,

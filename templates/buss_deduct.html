@@ -24,18 +24,17 @@
         <p>Fill in your details to get started with a smooth and hassle-free process.</p>
     </div>
     <div class="stepper">
-        <div class="step active" data-step="1">1</div>
+        <div class="step completed" data-step="1">1</div>
         <div class="line"></div>
-        <div class="step" data-step="2">2</div>
+        <div class="step active" data-step="2">2</div>
         <div class="line"></div>
         <div class="step" data-step="3">3</div>
-        <div class="line"></div>
-        <div class="step" data-step="4">4</div>
     </div>
 
     <div class="outer-container">
         <div class="content-container">
             <div class="form-section">
+                <form action="{{ url_for('bussdeduct') }}" method="POST">
                 <h1><i class="fa-solid fa-user"></i> Business Expenses</h1>
 
                 <label class="field-label" for="rent"><i class="fa-solid fa-house-user"></i> Rent <span
@@ -49,7 +48,7 @@
                 <label class="field-label" for="Bus-op"><i class="fa-solid fa-calendar"></i> Business operating
                     expenses<span class="lead">(ex:-electric bill,phone bill)</span><span
                         class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="Bus-op" name="Bus-op">
+                <input type="number" class="input-field" id="Bus-op" name="op-exp">
                 
               <div class="tooltip-container">
                     <label class="field-label" for="gross-income">
@@ -62,7 +61,7 @@
                 
                 <label class="field-label" for="other-expenses"><i class="fa-solid fa-plus"></i> Other expenses <span
                     class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="other-expenses" name="other-expenses">
+                <input type="number" class="input-field" id="other-expenses" name="oth-expenses">
 
 
                 <hr style="margin: 30px 0;">
@@ -71,11 +70,11 @@
 
                 <label class="field-label" for="section80c"><i class="fa-solid fa-file-invoice"></i> Section 80C <span
                     class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="section80c" name="section80c">
+                <input type="number" class="input-field" id="section80c" name="section-80c">
 
                 <label class="field-label" for="section80d"><i class="fa-solid fa-notes-medical"></i> Section 80D <span
                     class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="section80d" name="section80d">
+                <input type="number" class="input-field" id="section80d" name="section-80d">
 
                  <div class="tooltip-container">
                     <label class="field-label" for="gross-income">
@@ -92,6 +91,7 @@
                         <span class="front text"> Calculate Tax </span>
                     </button>
                 </div>
+                </form>
 
             </div>
         </div>

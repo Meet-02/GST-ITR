@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,121 +10,89 @@
 
 <body>
 
-    <!-- Fixed Header -->
     <header id="header">
-        <div class="logo-area">
-            <img src="{{ url_for('static', filename='IMAGES/Untitled__2_-removebg-preview.png') }}" alt="Header Photo"
-                class="header-photo">
-            <span>GST & ITR Portal</span>
-        </div>
-    </header>
-
-    <!-- Page Background Banner -->
+     </header>
     <div class="banner">
-        <h1><i class="fa-solid fa-file-invoice-dollar"></i> Easy GST & ITR Filing</h1>
-        <p>Fill in your details to get started with a smooth and hassle-free process.</p>
-    </div>
+     </div>
     <div class="stepper">
         <div class="step active" data-step="1">1</div>
         <div class="line"></div>
         <div class="step" data-step="2">2</div>
         <div class="line"></div>
         <div class="step" data-step="3">3</div>
+
     </div>
 
-    <!-- Main Form -->
     <div class="outer-container">
         <div class="content-container">
             <div class="form-section">
-                <h1><i class="fa-solid fa-user"></i> Income Details</h1>
 
-                <label class="field-label" for="gr-in"><i class="fa-solid fa-id-badge"></i> Gross income <span
-                        class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="gr-in" maxlength="10" name="gr-in" required>
+                <form action="{{ url_for('businessdet') }}" method="POST">
 
-                <label class="field-label" for="oth-in"><i class="fa-solid fa-user-group"></i> Other income source <span
-                        class="lead">(Total Amount)</span> <span class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="oth-in" maxlength="10" name="oth-in" required>
-
-                <label class="field-label" for="total-revenue">
-                    <i class="fa-solid fa-calculator"></i> Total Revenue
-                </label>
-                <input type="number" class="input-field" id="total-revenue" name="total-rev" readonly
-                    style="background-color: #f0f0f0; font-weight: bold;">
-
+                    <h1><i class="fa-solid fa-user"></i> Income Details</h1>
                     
-                <h1><i class="fa-solid fa-user"></i> Bussiness Details</h1>
+                    <label class="field-label" for="gr-in">Gross income <span class="asterisk">*</span></label>
+                    <input type="number" class="input-field" id="gr-in" name="gr-in" required>
+                    
+                    <label class="field-label" for="oth-in">Other income source <span class="lead">(Total Amount)</span> <span class="asterisk">*</span></label>
+                    <input type="number" class="input-field" id="oth-in" name="oth-in" required>
 
-                <label class="field-label" for="Bus"><i class="fa-solid fa-calendar"></i> Bussines name <span
-                        class="asterisk">*</span></label>
-                <input type="text" class="input-field" id="Bus" name="Bus" required>
+                    <label class="field-label" for="total-revenue"><i class="fa-solid fa-calculator"></i> Total Revenue</label>
+                    <input type="number" class="input-field" id="total-revenue" name="total-rev" readonly style="background-color: #f0f0f0; font-weight: bold;">
 
-                <label class="field-label" for="pr-name"><i class="fa-solid fa-object-group"></i> Product name <span
-                        class="asterisk">*</span></label>
-                <input type="text" class="input-field" id="pr-name" name="pr-name" required>
+                    <h1><i class="fa-solid fa-user"></i> Business Details</h1>
+                    
+                    <label class="field-label" for="Bus">Business name <span class="asterisk">*</span></label>
+                    <input type="text" class="input-field" id="Bus" name="Bus" required>
+                    
+                    <label class="field-label" for="pr-name">Product name <span class="asterisk">*</span></label>
+                    <input type="text" class="input-field" id="pr-name" name="pr-name" required>
 
+                    <label class="field-label" for="pur-price">Purchase value <span class="lead">(without GST)</span><span class="asterisk">*</span></label>
+                    <input type="number" class="input-field" id="pur-price" name="pur-price" required>
+                    
+                    <label class="field-label" for="pur-gst">GST RATE <span class="lead">(according to purchase)</span><span class="asterisk">*</span></label>
+                    <select class="input-field" id="pur-gst" name="pur-gst" required>
+                        <option value="" disabled selected>Select GST Rate</option>
+                        <option value="5">5%</option>
+                        <option value="12">12%</option>
+                        <option value="18">18%</option>
+                        <option value="28">28%</option>
+                    </select>
 
-                <label class="field-label" for="pur-price"> <i class="fa fa-money-bill" aria-hidden="true"></i>Purchase
-                    value <span class="lead">(without GST)</span>
-                    <span class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="pur-price" maxlength="12" name="pur-price" required>
+                    <label class="field-label" for="tos-p">Type of Supply <span class="lead">(according to purchase)</span> <span class="asterisk">*</span></label>
+                    <select class="input-field" id="tos-p" name="tos-p" required>
+                        <option value="" selected disabled>Select</option>
+                        <option value="Intra-State">Intra-State</option>
+                        <option value="Inter-State">Inter-State</option>
+                    </select>
 
+                    <label class="field-label" for="sal-price">SELL value <span class="lead">(without GST)</span><span class="asterisk">*</span></label>
+                    <input type="number" class="input-field" id="sal-price" name="sal-price" required>
 
+                    <label class="field-label" for="sell-gst">GST RATE <span class="lead">(according to SELL)</span><span class="asterisk">*</span></label>
+                    <select class="input-field" id="sal-gst" name="sell-gst" required>
+                        <option value="" disabled selected>Select GST Rate</option>
+                        <option value="5">5%</option>
+                        <option value="12">12%</option>
+                        <option value="18">18%</option>
+                        <option value="28">28%</option>
+                    </select>
 
+                    <label class="field-label" for="tos-s">Type of Supply <span class="lead">(according to selling)</span> <span class="asterisk">*</span></label>
+                    <select class="input-field" id="tos-s" name="tos-s" required>
+                        <option value="" selected disabled>Select</option>
+                        <option value="Intra-State">Intra-State</option>
+                        <option value="Inter-State">Inter-State</option>
+                    </select>
 
-                <label class="field-label" for="pur-gst">
-                    <i class="fas fa-chart-bar"></i> GST RATE <span class="lead">(according to purchase)</span>
-                    <span class="asterisk">*</span>
-                </label>
+                    <div class="button-container">
+                        <button type="submit" class="submit-button">Submit</button>
+                    </div>
 
-                <select class="input-field" id="pur-gst" name="pur-gst" required>
-                    <option value="" disabled selected>Select GST Rate</option>
-                    <option value="5">5%</option>
-                    <option value="12">12%</option>
-                    <option value="18">18%</option>
-                    <option value="28">28%</option>
-                </select>
-                <label class="field-label" for="tos-p"><i class="fa-solid fa-car"></i> Type of Supply <span
-                        class="lead">(according to purchase)</span> <span class="asterisk">*</span></label>
-                <select class="input-field" id="tos-p" name="tos-p" required>
-                    <option value="" selected disabled>Select</option>
-                    <option value="Intra-State">Intra-State</option>
-                    <option value="Inter-State">Inter-State</option>
-                </select>
-
-                <label class="field-label" for="sal-price"> <i class="fa fa-money-bill" aria-hidden="true"></i>SELL
-                    value <span class="lead">(without GST)</span>
-                    <span class="asterisk">*</span></label>
-                <input type="number" class="input-field" id="sal-price" maxlength="12" name="sal-price" required>
-
-                <label class="field-label" for="sell-gst">
-                    <i class="fas fa-chart-bar"></i> GST RATE <span class="lead">(according to SELL)</span>
-                    <span class="asterisk">*</span>
-                </label>
-
-                <select class="input-field" id="sal-gst" name="sell-gst" required>
-                    <option value="" disabled selected>Select GST Rate</option>
-                    <option value="5">5%</option>
-                    <option value="12">12%</option>
-                    <option value="18">18%</option>
-                    <option value="28">28%</option>
-                </select>
-                <label class="field-label" for="tos-s"><i class="fa-solid fa-car"></i> Type of Supply <span
-                        class="lead">(according to selling)</span> <span class="asterisk">*</span></label>
-                <select class="input-field" id="tos-s" name="tos-s" required>
-                    <option value="" selected disabled>Select</option>
-                    <option value="Intra-State">Intra-State</option>
-                    <option value="Inter-State">Inter-State</option>
-                </select>
-                <div class="button-container">
-                    <button type="submit" class="submit-button">Submit</button>
-                </div>
-
-            </div>
+                </form> </div>
         </div>
     </div>
-
     <script src="{{ url_for('static', filename='pg1.js') }}"></script>
 </body>
-
 </html>

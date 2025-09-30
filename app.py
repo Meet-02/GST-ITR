@@ -152,6 +152,8 @@ def common_details():
                 INSERT INTO businesses (person_id, business_name, date_of_gst_registration, gstin, nature_of_business)
                 VALUES (?, ?, ?, ?, ?)
             ''', (person_id, business_name, gst_date, gstin, nature))
+            business_id = cursor.lastrowid
+            session['business_id'] = business_id
 
         conn.commit()
         flash("Details submitted successfully!")
@@ -165,12 +167,16 @@ def common_details():
             return redirect(url_for("details"))
 
 
-# BUSINESS DETAILS
+# In app.py, DELETE your existing 'businessdet', 'bussdeduct', 
+# and 'bus_result' functions and REPLACE them with this block:
+
+# Handles the submission from the business income/details form
 @app.route('/details/Business', methods=['POST'])
 def businessdet():
+    # Get income and GST details from the form
     grin = get_float('gr-in')
     othin = get_float('oth-in')
-    total_rev = get_float('total-revenue')
+    total_rev = grin + othin # Calculate total revenue here
     Bus = request.form.get('Bus')
     prname = request.form.get('pr-name')
     purprice = get_float('pur-price')
@@ -179,78 +185,107 @@ def businessdet():
     salprice = get_float('sal-price')
     sellgst = get_float('sell-gst')
     toss = request.form.get('tos-s')
+    business_id = session.get('business_id')
 
+    # Save data to the database (your code is correct here)
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-
-        cursor.execute('''INSERT INTO income_details(business_id, gross_income, other_income,Total_income)
-        VALUES(?,?,?,?)''', (Bus, grin, othin,total_rev))
-
+        cursor.execute('''INSERT INTO income_details(business_id, gross_income, other_income, Total_revenue)
+        VALUES(?,?,?,?)''', (business_id, grin, othin, total_rev))
         cursor.execute('''INSERT INTO business_details(business_id, business_name, product_name, purchase_value, gst_rate_purchase, type_of_supply_purchase, sell_value, gst_rate_sell, type_of_supply_sell)
-        VALUES(?,?,?,?,?,?,?,?,?)''', (Bus, Bus, prname, purprice, purgst, tosp, salprice, sellgst, toss))
+        VALUES(?,?,?,?,?,?,?,?,?)''', (business_id, Bus, prname, purprice, purgst, tosp, salprice, sellgst, toss))
         conn.commit()
 
-    session['business_income'] = {
-        'business_id': Bus,
-        'gross_income': grin,
-        'other_income': othin,
-        'total_income': total_rev
-    }
-
-    session['business_details'] = {
-        'business_id': Bus,
-        'business_name': Bus,
-        'product_name': prname,
-        'purchase_value': purprice,
-        'gst_rate_purchase': purgst,
-        'type_of_supply_purchase': tosp,
-        'sell_value': salprice,
-        'gst_rate_sell': sellgst,
-        'type_of_supply_sell': toss
-    }
+    # Save data to the session
+    session['business_income'] = {'gross_income': grin, 'other_income': othin, 'total_income': total_rev}
+    session['business_details'] = {'purchase_value': get_float('pur-price'), 'gst_rate_purchase': get_float('pur-gst'), 'type_of_supply_purchase': request.form.get('tos-p'), 'sell_value': get_float('sal-price'), 'gst_rate_sell': get_float('sell-gst'), 'type_of_supply_sell': request.form.get('tos-s')}
 
     flash("Business details submitted successfully!")
     return redirect(url_for("bus_deduct"))
 
-@app.route('/details/Business/deduct')
-def bussdeduct():
-    rent=get_float('rent')
-    emp_w=get_float('emp-w')
-    Bus_op=get_float('op-exp')
-    sub=get_float('sub')
-    oth=get_float('oth-expenses')
-    section80c=get_float('section-80c')
-    section80d=get_float('section-80d')
-    other_deduction=get_float('other-ded')
+# Handles the submission from the business expenses/deductions form
+# In app.py
 
+@app.route('/details/Business/deduct', methods=['POST'])
+def bussdeduct():
+    # Get expenses and finance deductions from the form
+    rent = get_float('rent')
+    emp_w = get_float('emp-w')
+    Bus_op = get_float('op-exp')
+    sub = get_float('sub')
+    oth = get_float('oth-expenses')
+    section80c = get_float('section-80c')
+    section80d = get_float('section-80d')
+    other_deduction = get_float('other-ded')
+
+    # --- DATABASE INSERTION CODE ---
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
 
+        # Insert into the business_expenses table
         cursor.execute('''
-        INSERT INTO business_expenses(rent, employee_wage, operating_expenses, subscription, other_expenses)
-        VALUES(?,?,?,?,?)''', (rent, emp_w, Bus_op, sub, oth))
+            INSERT INTO business_expenses (rent, employee_wage, operating_expenses, subscription, other_expenses)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (rent, emp_w, Bus_op, sub, oth))
 
+        # Insert into the finance_deduction table
         cursor.execute('''
-        INSERT INTO finance_deduction(section_80c, section_80d, other_deduction)
-        VALUES(?,?,?)''', (section80c, section80d, other_deduction))
+            INSERT INTO finance_deduction (section_80c, section_80d, other_deduction)
+            VALUES (?, ?, ?)
+        ''', (section80c, section80d, other_deduction))
+        
         conn.commit()
-    
-    session['business_expenses'] = {   
+    # --------------------------------
+
+    # Save data to the session (with the typo fixed)
+    session['business_expenses'] = {
         'rent': rent,
         'employee_wage': emp_w,
-        'operating_expenses': Bus_op,
+        'operating_expenses': Bus_op, # Corrected from 'op-exp'
         'subscription': sub,
         'other_expenses': oth
     }
-
     session['finance_deduction'] = {
         'section_80c': section80c,
         'section_80d': section80d,
         'other_deduction': other_deduction
     }
+    
+    flash("Expenses and deductions submitted successfully!")
+    # Redirect to the result page
     return redirect(url_for("bus_result"))
 
+# In app.py, replace your bus_result function with this one:
 
+@app.route('/details/Business/deduct/result')
+def bus_result():
+    required_keys = ['business_income', 'business_details', 'business_expenses']
+    if not all(key in session for key in required_keys):
+        flash("Session data is missing. Please fill out the business forms again.")
+        return redirect(url_for('business'))
+
+    bus_income = session.get('business_income', {})
+    bus_details = session.get('business_details', {})
+    bus_expenses = session.get('business_expenses', {})
+    
+    gross_revenue = bus_income.get('total_income', 0)
+    total_expenses = sum(bus_expenses.values())
+    final_tax_payable, net_taxable_income = calc_bus_tax_new_regime(gross_revenue, total_expenses)
+
+    gst_results = calculate_gst(
+        bus_details.get('purchase_value', 0), int(bus_details.get('gst_rate_purchase', 0)),
+        bus_details.get('type_of_supply_purchase', ''), bus_details.get('sell_value', 0),
+        int(bus_details.get('gst_rate_sell', 0)), bus_details.get('type_of_supply_sell', '')
+    )
+    final_gst_payable = gst_results['net_payable']['total']
+
+    return render_template(
+        "tax_result_bus.html",
+        gross_income=round(gross_revenue, 2),
+        net_taxable_income=round(net_taxable_income, 2),
+        gst_payable=round(final_gst_payable, 2),
+        final_tax_payable=round(final_tax_payable, 2)
+    )
 # JOB DETAILS
 @app.route('/details/Job', methods=['POST'])
 def jobdet():
@@ -337,20 +372,9 @@ def jobdeduct():
     flash("Job deductions submitted successfully!")
     return redirect(url_for("job_result"))
 
-@app.route('/details/Business/deduct/result')
-def bus_result():
-    bus_income=session.get('business_expenses', {})
-    bus_details=session.get('finance_deduction', {})
 
-    grin=business_expenses.get('gr-in', 0)
-    othin=business_expenses.get('oth-in', 0)
-    total_rev=business_expenses.get('total-revenue', 0)
+# In app.py
 
-    gross_income=grin+othin+total_rev
-
-    total_tax,total_income=calc_bus_tax_new_regime(tax, gross_income)
-
-    return render_template("tax_result_bus.html", tax=total_tax, net_income=total_income, gross_income=gross_income)
 
 
 @app.route('/details/Job/deduct/result')
@@ -508,10 +532,14 @@ def download_business_report():
     total_revenue = bus_income.get('total_income', 0)
     total_expenses = sum(bus_expenses.values())
     total_deductions = sum(fin_deductions.values())
-    
-    # Assuming calc_bus_tax_new_regime calculates and returns the final taxable income
-    # You may need to adjust the function call based on what calc_bus_tax_new_regime expects
-    taxable_income = calc_bus_tax_new_regime(total_revenue, total_expenses, total_deductions)
+
+    net_taxable_income = total_revenue - total_expenses - total_deductions
+    if net_taxable_income < 0:
+        net_taxable_income = 0
+
+    # --- CORRECTED FUNCTION CALL (only 2 arguments) ---
+    final_tax_due, _ = calc_bus_tax_new_regime(net_taxable_income, 0)
+    # --------------------------------------------------
 
     # 5. Assemble the complete data dictionary for the PDF
     data_for_pdf = {
@@ -519,7 +547,7 @@ def download_business_report():
         'income': {
             'gross_income': bus_income.get('gross_income', 0),
             'other_income': bus_income.get('other_income', 0),
-            'total_revenue': bus_income.get('total_income', 0),
+            'total_revenue': total_revenue,
             'business_name': bus_details.get('business_name', 'N/A'),
             'product_name': bus_details.get('product_name', 'N/A'),
         },
@@ -537,19 +565,21 @@ def download_business_report():
             'operating_expenses': bus_expenses.get('operating_expenses', 0),
             'subscription': bus_expenses.get('subscription', 0),
             'other': bus_expenses.get('other_expenses', 0),
+            # Note: We pass these to the PDF but they are not used in the tax calc
             '80c': fin_deductions.get('section_80c', 0),
             '80d': fin_deductions.get('section_80d', 0),
             'other_deductions': fin_deductions.get('other_deduction', 0)
         },
         'summary': {
-            'taxable_income': taxable_income
+            'taxable_income': net_taxable_income,
+            'final_tax_due': final_tax_due
         }
     }
     
-    # 6. Generate the PDF in memory
+    # 6. Generate the PDF
     pdf_buffer = create_business_report(data_for_pdf)
 
-    # 7. Send the PDF file to the user for download
+    # 7. Send the PDF file
     return send_file(
         pdf_buffer,
         as_attachment=True,

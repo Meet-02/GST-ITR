@@ -100,10 +100,12 @@ def create_tax_report(data):
     total_revenue = data['income']['total_revenue']
     taxable_income = data['summary']['taxable_income']
 
+    final_tax_due = data['summary']['final_tax_due']
     final_summary_data = [
         ['Net GST Liability', Paragraph(f"₹ {net_gst_liability:,.2f}", bold_value_style)],
         ['Total Revenue Generated', Paragraph(f"₹ {total_revenue:,.2f}", bold_value_style)],
-        ['Net Taxable Income', Paragraph(f"₹ {taxable_income:,.2f}", bold_value_style)]
+        ['Net Taxable Income', Paragraph(f"₹ {taxable_income:,.2f}", bold_value_style)],
+        ['Final Tax Payable', Paragraph(f"₹ {final_tax_due:,.2f}", bold_value_style)]
     ]
     final_summary_table = Table(final_summary_data, colWidths=[250, 200])
     final_summary_table.setStyle(TableStyle([

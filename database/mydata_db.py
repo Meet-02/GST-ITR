@@ -1,8 +1,7 @@
-# mydata_db.py
 import sqlite3
 import os
 
-# Get project root (parent of this file’s folder)
+# Get project root (parent of this file’s folder) - RESTORED TO YOUR ORIGINAL METHOD
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Database folder (only one level)
@@ -38,19 +37,8 @@ def init_db():
         mobile_number TEXT
     )
     ''')
-
-    # Job Person
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS job_person (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        person_id INTEGER,
-        employer_category TEXT,
-        employer_tan_number TEXT,
-        FOREIGN KEY(person_id) REFERENCES people_info(id)
-    )
-    ''')
-
-    # Businesses
+    
+    # --- Business Related Tables ---
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS businesses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,10 +62,11 @@ def init_db():
     )
     ''')
 
-
+    cursor.execute('DROP TABLE IF EXISTS business_details')
     cursor.execute('''
-    CREATE TABLE IF NOT EXISTS business_details (
-        business_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    CREATE TABLE business_details (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        business_id INTEGER,
         business_name TEXT,
         product_name TEXT,
         purchase_value REAL,
@@ -85,7 +74,8 @@ def init_db():
         type_of_supply_purchase TEXT,
         sell_value REAL,
         gst_rate_sell TEXT,
-        type_of_supply_sell TEXT
+        type_of_supply_sell TEXT,
+        FOREIGN KEY(business_id) REFERENCES businesses(id)
     )
     ''')
 
@@ -106,7 +96,17 @@ def init_db():
         other_deduction REAL
     )
     ''')
-
+    
+    # --- Job Related Tables ---
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS job_person (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        person_id INTEGER,
+        employer_category TEXT,
+        employer_tan_number TEXT,
+        FOREIGN KEY(person_id) REFERENCES people_info(id)
+    )
+    ''')
 
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS job_details (
@@ -142,10 +142,9 @@ def init_db():
     )
     ''')
 
-
     conn.commit()
     conn.close()
-    print(f"✅ All tables created successfully in {db_path}")
+    print(f"All tables created successfully in {db_path}")
 
 if __name__ == "__main__":
     init_db()
