@@ -6,9 +6,19 @@ from calc_bus import calc_bus_tax_new_regime
 from calc_gst import calculate_gst 
 from bus_pdf_gen import create_tax_report as create_business_report
 import os
+import google.generativeai as genai
+from dotenv import load_dotenv
 import re
 from flask import send_file
 from pdf_gen import create_tax_report
+
+load_dotenv()
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+else:
+    print("Warning: GEMINI_API_KEY not found. AI features will be disabled.")
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -257,17 +267,21 @@ def bussdeduct():
 
 # In app.py, replace your bus_result function with this one:
 
-@app.route('/details/Business/deduct/result')
+@app.route('/details/Business/result')
 def bus_result():
-    required_keys = ['business_income', 'business_details', 'business_expenses']
+    # 1. Check if all required session data exists
+    required_keys = ['business_income', 'business_details', 'business_expenses', 'finance_deduction']
     if not all(key in session for key in required_keys):
         flash("Session data is missing. Please fill out the business forms again.")
         return redirect(url_for('business'))
 
+    # 2. Get the correct data from the session
     bus_income = session.get('business_income', {})
     bus_details = session.get('business_details', {})
     bus_expenses = session.get('business_expenses', {})
+    fin_deductions = session.get('finance_deduction', {})
     
+    # --- ITR & GST Calculations (no change) ---
     gross_revenue = bus_income.get('total_income', 0)
     total_expenses = sum(bus_expenses.values())
     final_tax_payable, net_taxable_income = calc_bus_tax_new_regime(gross_revenue, total_expenses)
@@ -279,12 +293,42 @@ def bus_result():
     )
     final_gst_payable = gst_results['net_payable']['total']
 
+    # --- NEW: Call Gemini for Business Insights ---
+    insights = ""
+    if GEMINI_API_KEY:
+        try:
+            # 1. Create a prompt tailored for a business owner
+            prompt = f"""
+            You are a helpful Indian tax-saving assistant. Analyze the following data for a business owner and provide 2-3 simple, actionable tax-saving tips in bullet points.
+
+            **User's Financial Data:**
+            - Total Annual Revenue: ₹{gross_revenue:,.2f}
+            - Total Business Expenses: ₹{total_expenses:,.2f}
+            - Section 80C Investment: ₹{fin_deductions.get('section_80c', 0):,.2f}
+            - Section 80D (Health Insurance): ₹{fin_deductions.get('section_80d', 0):,.2f}
+
+            **Your Task:**
+            Based on the data above, provide 2-3 personalized and easy-to-understand tips in bullet points on how this user could potentially save more on income tax next year. 
+            Focus on areas where their deductions seem low or where common tax-saving opportunities might exist for a business owner (like presumptive tax, cash expenses, etc.).
+            """
+            
+            # 2. Call the Gemini API
+            model = genai.GenerativeModel('gemini-pro-latest')
+            response = model.generate_content(prompt)
+            insights = response.text
+
+        except Exception as e:
+            print(f"Error calling Gemini API for business report: {e}")
+            insights = "Could not generate AI insights at this time."
+    
+    # 3. Render the template with all the final values
     return render_template(
         "tax_result_bus.html",
         gross_income=round(gross_revenue, 2),
         net_taxable_income=round(net_taxable_income, 2),
         gst_payable=round(final_gst_payable, 2),
-        final_tax_payable=round(final_tax_payable, 2)
+        final_tax_payable=round(final_tax_payable, 2),
+        insights=insights
     )
 # JOB DETAILS
 @app.route('/details/Job', methods=['POST'])
@@ -375,33 +419,72 @@ def jobdeduct():
 
 # In app.py
 
-
-
-@app.route('/details/Job/deduct/result')
+@app.route('/details/Job/result')
 def job_result():
     job_income = session.get('job_income', {})
     job_deductions = session.get('job_deductions', {})
 
+    # --- Your existing code to get income values (This is correct) ---
     bas_sal = job_income.get('basic_salary', 0)
     hra_rec = job_income.get('hra_received', 0)
     sav_int = job_income.get('savings_interest', 0)
     fd_int = job_income.get('fd_interest', 0)
     oth_inc = job_income.get('other_income', 0)
-    
-
     tds = job_deductions.get('tds', 0)
-
     gross_income = bas_sal + hra_rec + sav_int + fd_int + oth_inc
-
-
+    
+    # --- Your tax calculation (This is correct) ---
     final_tax_due, taxable_income = calc_job_tax_new_regime(gross_income, tds)
 
-    # 5. Pass the correct values to the template
+    # --- CORRECTED SECTION for AI Insights ---
+    insights = ""
+    if GEMINI_API_KEY:
+        try:
+            # 1. Correctly gather and sum the deduction data for the prompt
+            section_80c_total = (
+                job_deductions.get('epf_ppf', 0) +
+                job_deductions.get('life_ins', 0) +
+                job_deductions.get('elss', 0) +
+                job_deductions.get('home_loan_principal', 0) +
+                job_deductions.get('tuition', 0) +
+                job_deductions.get('other_80c', 0)
+            )
+            
+            health_insurance_80d = (
+                job_deductions.get('health_ins_self', 0) +
+                job_deductions.get('health_ins_parents', 0)
+            )
+
+            # 2. Create the prompt using the new, correct variables
+            prompt = f"""
+            You are a helpful Indian tax-saving assistant. Analyze the following data for a salaried employee and provide 2-3 simple, actionable tax-saving tips in bullet points.
+
+            **User's Financial Data:**
+            - Gross Annual Salary: ₹{gross_income:,.2f}
+            - Total Section 80C Investments: ₹{section_80c_total:,.2f}
+            - Total Health Insurance (80D): ₹{health_insurance_80d:,.2f}
+
+            **Your Task:**
+            Based on the data above, provide 2-3 personalized and easy-to-understand tips in bullet points on how this user could potentially save more on income tax next year. 
+            Focus on areas where their deductions seem low compared to the available limits.
+            """
+            
+            # 3. Call the Gemini API
+            model = genai.GenerativeModel('gemini-pro-latest')
+            response = model.generate_content(prompt)
+            insights = response.text
+
+        except Exception as e:
+            print(f"Error calling Gemini API for job report: {e}")
+            insights = "Could not generate AI insights at this time."
+    
+    # Pass all correct values to the template
     return render_template(
         "tax_result_job.html", 
         tax=final_tax_due, 
         net_income=taxable_income, 
-        gross_income=gross_income  
+        gross_income=gross_income,
+        insights=insights
     )
 
 @app.route('/details/Business/deduct/result', methods=['POST'])
