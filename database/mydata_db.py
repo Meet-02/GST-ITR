@@ -169,7 +169,6 @@ def init_db():
         insights TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(person_id) REFERENCES people_info(id),
-        FOREIGN KEY(job_id) REFERENCES job_person(id)
     )
     ''')
 
