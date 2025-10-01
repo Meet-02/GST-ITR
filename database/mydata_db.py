@@ -142,6 +142,37 @@ def init_db():
     )
     ''')
 
+    # Tax Results Tables
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS tax_results_business (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        person_id INTEGER,
+        business_id INTEGER,
+        gross_income REAL,
+        net_taxable_income REAL,
+        gst_payable REAL,
+        final_tax_payable REAL,
+        insights TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(person_id) REFERENCES people_info(id),
+        FOREIGN KEY(business_id) REFERENCES businesses(id)
+    )
+    ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS tax_results_job (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        person_id INTEGER,
+        tax REAL,
+        net_income REAL,
+        gross_income REAL,
+        insights TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(person_id) REFERENCES people_info(id),
+        FOREIGN KEY(job_id) REFERENCES job_person(id)
+    )
+    ''')
+
     conn.commit()
     conn.close()
     print(f"All tables created successfully in {db_path}")

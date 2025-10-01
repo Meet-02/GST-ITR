@@ -308,10 +308,10 @@ def bus_result():
             - Section 80D (Health Insurance): ₹{fin_deductions.get('section_80d', 0):,.2f}
 
             **Your Task:**
-            Based on the data above, provide 2-3 personalized and easy-to-understand tips in bullet points on how this user could potentially save more on income tax next year. 
+            Based on the data above, provide 2-3 personalized and easy-to-understand tips in bullet points on how this user could potentially save more on income tax next year.
             Focus on areas where their deductions seem low or where common tax-saving opportunities might exist for a business owner (like presumptive tax, cash expenses, etc.).
             """
-            
+
             # 2. Call the Gemini API
             model = genai.GenerativeModel('gemini-pro-latest')
             response = model.generate_content(prompt)
@@ -320,7 +320,18 @@ def bus_result():
         except Exception as e:
             print(f"Error calling Gemini API for business report: {e}")
             insights = "Could not generate AI insights at this time."
-    
+
+    # --- Save results to database ---
+    person_id = session.get('person_id')
+    business_id = session.get('business_id')
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO tax_results_business (person_id, business_id, gross_income, net_taxable_income, gst_payable, final_tax_payable, insights)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (person_id, business_id, round(gross_revenue, 2), round(net_taxable_income, 2), round(final_gst_payable, 2), round(final_tax_payable, 2), insights))
+        conn.commit()
+
     # 3. Render the template with all the final values
     return render_template(
         "tax_result_bus.html",
@@ -449,7 +460,7 @@ def job_result():
                 job_deductions.get('tuition', 0) +
                 job_deductions.get('other_80c', 0)
             )
-            
+
             health_insurance_80d = (
                 job_deductions.get('health_ins_self', 0) +
                 job_deductions.get('health_ins_parents', 0)
@@ -465,10 +476,10 @@ def job_result():
             - Total Health Insurance (80D): ₹{health_insurance_80d:,.2f}
 
             **Your Task:**
-            Based on the data above, provide 2-3 personalized and easy-to-understand tips in bullet points on how this user could potentially save more on income tax next year. 
+            Based on the data above, provide 2-3 personalized and easy-to-understand tips in bullet points on how this user could potentially save more on income tax next year.
             Focus on areas where their deductions seem low compared to the available limits.
             """
-            
+
             # 3. Call the Gemini API
             model = genai.GenerativeModel('gemini-pro-latest')
             response = model.generate_content(prompt)
@@ -477,12 +488,22 @@ def job_result():
         except Exception as e:
             print(f"Error calling Gemini API for job report: {e}")
             insights = "Could not generate AI insights at this time."
-    
+
+    # --- Save results to database ---
+    person_id = session.get('person_id')
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO tax_results_job (person_id, tax, net_income, gross_income, insights)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (person_id, round(final_tax_due, 2), round(taxable_income, 2), round(gross_income, 2), insights))
+        conn.commit()
+
     # Pass all correct values to the template
     return render_template(
-        "tax_result_job.html", 
-        tax=final_tax_due, 
-        net_income=taxable_income, 
+        "tax_result_job.html",
+        tax=final_tax_due,
+        net_income=taxable_income,
         gross_income=gross_income,
         insights=insights
     )
