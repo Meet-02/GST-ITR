@@ -61,70 +61,127 @@ def select_category():
 
 @app.route('/dashboard/job')
 def dashboard_job():
-    # Fetch data for job dashboard
     person_id = session.get('person_id')
-    if not person_id:
-        return redirect(url_for('details'))
+    pan = session.get('pan')
+    
+    print(f"DEBUG: person_id={person_id}, pan={pan}")  # Debug line
+    
+    if not person_id or not pan:
+        flash("Please login again")
+        return redirect(url_for('sign_up'))
 
-    # Fetch tax results grouped by year
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
+        
+        # Debug: Check what's in the database
+        cursor.execute("SELECT COUNT(*) FROM tax_results_job WHERE person_id = ? AND pan_id = ?", (person_id, pan))
+        count = cursor.fetchone()[0]
+        print(f"DEBUG: Found {count} records in tax_results_job")
+        
+        # Get ALL calculations in chronological order
         cursor.execute('''
-            SELECT strftime('%Y', created_at) as year, SUM(gross_income) as total_gross, AVG(tax) as avg_tax
-            FROM tax_results_job
-            WHERE person_id = ?
-            GROUP BY strftime('%Y', created_at)
-            ORDER BY year DESC
-        ''', (person_id,))
-        yearly_data = cursor.fetchall()
-
-        # Fetch all history
-        cursor.execute('SELECT gross_income, tax, created_at FROM tax_results_job WHERE person_id = ? ORDER BY created_at DESC', (person_id,))
+            SELECT id, financial_year, gross_income, tax, net_income, insights, created_at 
+            FROM tax_results_job 
+            WHERE person_id = ? AND pan_id = ? 
+            ORDER BY created_at ASC 
+        ''', (person_id, pan))
         all_results = cursor.fetchall()
+        
+        print(f"DEBUG: Fetched {len(all_results)} records")  # Debug line
 
-    # Prepare data for charts
-    labels = [row[0] for row in yearly_data] if yearly_data else []
-    gross_income_data = [row[1] for row in yearly_data] if yearly_data else []
-    tax_data = [row[2] for row in yearly_data] if yearly_data else []
+    # Prepare data for charts - ALL calculations as individual points
+    if all_results:
+        labels = [f"Calc {i+1}\n({row[1]})" for i, row in enumerate(all_results)]
+        gross_income_data = [row[2] for row in all_results]
+        tax_data = [row[3] for row in all_results]
+        net_income_data = [row[4] for row in all_results]
+    else:
+        labels = []
+        gross_income_data = []
+        tax_data = []
+        net_income_data = []
 
-    # Fetch history
-    history = [{'date': row[2], 'gross_income': row[0], 'tax': row[1]} for row in all_results]
+    # Prepare history (reverse order for display)
+    history = [{
+        'id': row[0],
+        'financial_year': row[1],
+        'gross_income': row[2], 
+        'tax': row[3],
+        'net_income': row[4],
+        'insights': row[5],
+        'date': row[6]
+    } for row in all_results[::-1]]  # Reverse for newest first
 
-    return render_template('dash_job.html', labels=labels, gross_income_data=gross_income_data, tax_data=tax_data, history=history)
+    return render_template('dash_job.html', 
+                         labels=labels, 
+                         gross_income_data=gross_income_data, 
+                         tax_data=tax_data, 
+                         net_income_data=net_income_data,
+                         history=history,
+                         pan_number=pan,
+                         total_calculations=len(all_results))
 
 @app.route('/dashboard/business')
 def dashboard_business():
-    # Fetch data for business dashboard
     person_id = session.get('person_id')
-    if not person_id:
-        return redirect(url_for('details'))
+    pan = session.get('pan')
+    
+    print(f"DEBUG: person_id={person_id}, pan={pan}")  # Debug line
+    
+    if not person_id or not pan:
+        flash("Please login again")
+        return redirect(url_for('sign_up'))
 
-    # Fetch tax results grouped by year
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
+        
+        # Debug: Check what's in the database
+        cursor.execute("SELECT COUNT(*) FROM tax_results_business WHERE person_id = ? AND pan_id = ?", (person_id, pan))
+        count = cursor.fetchone()[0]
+        print(f"DEBUG: Found {count} records in tax_results_business")
+        
+        # Get ALL calculations
         cursor.execute('''
-            SELECT strftime('%Y', created_at) as year, SUM(gross_income) as total_revenue, AVG(gst_payable) as avg_gst, AVG(final_tax_payable) as avg_tax
-            FROM tax_results_business
-            WHERE person_id = ?
-            GROUP BY strftime('%Y', created_at)
-            ORDER BY year DESC
-        ''', (person_id,))
-        yearly_data = cursor.fetchall()
-
-        # Fetch all history
-        cursor.execute('SELECT gross_income, gst_payable, final_tax_payable, created_at FROM tax_results_business WHERE person_id = ? ORDER BY created_at DESC', (person_id,))
+            SELECT id, gross_income, net_taxable_income, gst_payable, final_tax_payable, insights, created_at 
+            FROM tax_results_business 
+            WHERE person_id = ? AND pan_id = ? 
+            ORDER BY created_at ASC  # Changed to ASC for proper timeline
+        ''', (person_id, pan))
         all_results = cursor.fetchall()
+        
+        print(f"DEBUG: Fetched {len(all_results)} records")  # Debug line
 
     # Prepare data for charts
-    labels = [row[0] for row in yearly_data] if yearly_data else []
-    revenue_data = [row[1] for row in yearly_data] if yearly_data else []
-    gst_data = [row[2] for row in yearly_data] if yearly_data else []
-    tax_data = [row[3] for row in yearly_data] if yearly_data else []
+    if all_results:
+        labels = [f"Calc {i+1}" for i, row in enumerate(all_results)]
+        revenue_data = [row[1] for row in all_results]
+        gst_data = [row[3] for row in all_results]
+        tax_data = [row[4] for row in all_results]
+    else:
+        labels = []
+        revenue_data = []
+        gst_data = []
+        tax_data = []
 
-    # Fetch history
-    history = [{'date': row[3], 'gross_income': row[0], 'gst_payable': row[1], 'final_tax_payable': row[2]} for row in all_results]
+    # Prepare history (reverse order for display)
+    history = [{
+        'id': row[0],
+        'gross_income': row[1], 
+        'net_taxable_income': row[2],
+        'gst_payable': row[3], 
+        'final_tax_payable': row[4],
+        'insights': row[5],
+        'date': row[6]
+    } for row in all_results[::-1]]  # Reverse for newest first
 
-    return render_template('dash_bus.html', labels=labels, revenue_data=revenue_data, gst_data=gst_data, tax_data=tax_data, history=history)
+    return render_template('dash_bus.html', 
+                         labels=labels, 
+                         revenue_data=revenue_data, 
+                         gst_data=gst_data, 
+                         tax_data=tax_data,
+                         history=history,
+                         pan_number=pan,
+                         total_calculations=len(all_results))
 
 @app.route('/logout')
 def logout():
@@ -160,7 +217,53 @@ def PANno(PAN):
     return bool(re.match(pattern, PAN))
 
 
-# SIGNUP
+# LOGIN - Update this function
+# LOGIN - Simplified version
+@app.route('/login', methods=['POST'])
+def login():
+    pan = request.form.get('PAN')
+    password = request.form.get('pass')
+
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM user WHERE PAN_ID = ?', (pan,))
+        user = cursor.fetchone()
+
+        if user:
+            stored_hash = user[2]  
+            if check_password_hash(stored_hash, password):
+                # Set session variables
+                session.permanent = True
+                session['pan'] = pan
+                
+                # Try to get person_id from any available source
+                cursor.execute('SELECT person_id FROM user_pan_mapping WHERE pan_id = ?', (pan,))
+                mapping_data = cursor.fetchone()
+                
+                if mapping_data:
+                    session['person_id'] = mapping_data[0]
+                else:
+                    # Get the latest person_id from people_info
+                    cursor.execute('SELECT id FROM people_info ORDER BY id DESC LIMIT 1')
+                    person_data = cursor.fetchone()
+                    if person_data:
+                        session['person_id'] = person_data[0]
+                    else:
+                        # Create a new person entry if none exists
+                        cursor.execute('INSERT INTO people_info (name) VALUES (?)', (f"User_{pan}",))
+                        session['person_id'] = cursor.lastrowid
+                        conn.commit()
+                
+                flash("Login successful")
+                return redirect(url_for('category'))
+            else:
+                flash("Invalid password")
+        else:
+            flash("Invalid PAN number")
+
+    return render_template('sign-up.html')
+
+# SIGNUP - Update this function
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form.get('name')
@@ -178,39 +281,31 @@ def signup():
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         try:
+            # First create user
             cursor.execute('INSERT INTO user (PAN_ID, Password) VALUES (?, ?)', (pan, generate_password_hash(password)))
+            
+            # Create a new person entry
+            cursor.execute('''
+                INSERT INTO people_info (name) VALUES (?)
+            ''', (username,))
+            
+            person_id = cursor.lastrowid
+            
+            # Create mapping between PAN and person
+            cursor.execute('''
+                INSERT OR REPLACE INTO user_pan_mapping (pan_id, person_id) 
+                VALUES (?, ?)
+            ''', (pan, person_id))
+            
             conn.commit()
+            
             session['pan'] = pan
+            session['person_id'] = person_id
             flash("Signup successful")
             return redirect(url_for('category'))
         except sqlite3.IntegrityError:
             flash("PAN number already exists")
-            return render_template('sign-up.html') 
-
-
-# LOGIN
-@app.route('/login', methods=['POST'])
-def login():
-    pan = request.form.get('PAN')
-    password = request.form.get('pass')
-
-    with sqlite3.connect(db_path) as conn:
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM user WHERE PAN_ID = ?', (pan,))
-        user = cursor.fetchone()
-
-        if user:
-            stored_hash = user[2]  
-            if check_password_hash(stored_hash, password):
-                flash("Login successful")
-                session['pan'] = pan
-                return redirect(url_for('category'))
-            else:
-                flash("Invalid password")
-        else:
-            flash("Invalid PAN number")
-
-    return render_template('sign-up.html')
+            return render_template('sign-up.html')
 
 
 # COMMON DETAILS
@@ -411,15 +506,17 @@ def bus_result():
             print(f"Error calling Gemini API for business report: {e}")
             insights = "Could not generate AI insights at this time."
 
-    # --- Save results to database ---
+    # --- Save results to database WITH PAN ---
     person_id = session.get('person_id')
     business_id = session.get('business_id')
+    pan = session.get('pan')  # Get PAN from session
+    
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO tax_results_business (person_id, business_id, gross_income, net_taxable_income, gst_payable, final_tax_payable, insights)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (person_id, business_id, round(gross_revenue, 2), round(net_taxable_income, 2), round(final_gst_payable, 2), round(final_tax_payable, 2), insights))
+            INSERT INTO tax_results_business (person_id, pan_id, business_id, gross_income, net_taxable_income, gst_payable, final_tax_payable, insights)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (person_id, pan, business_id, round(gross_revenue, 2), round(net_taxable_income, 2), round(final_gst_payable, 2), round(final_tax_payable, 2), insights))
         conn.commit()
 
     # 3. Render the template with all the final values
@@ -431,6 +528,7 @@ def bus_result():
         final_tax_payable=round(final_tax_payable, 2),
         insights=insights
     )
+
 # JOB DETAILS
 @app.route('/details/Job', methods=['POST'])
 def jobdet():
@@ -579,14 +677,16 @@ def job_result():
             print(f"Error calling Gemini API for job report: {e}")
             insights = "Could not generate AI insights at this time."
 
-    # --- Save results to database ---
+    # --- Save results to database WITH PAN ---
     person_id = session.get('person_id')
+    pan = session.get('pan')  # Get PAN from session
+    
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO tax_results_job (person_id, tax, net_income, gross_income, insights)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (person_id, round(final_tax_due, 2), round(taxable_income, 2), round(gross_income, 2), insights))
+            INSERT INTO tax_results_job (person_id, pan_id, financial_year, gross_income, tax, net_income, insights)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (person_id, pan, job_income.get('financial_year', 'N/A'), round(gross_income, 2), round(final_tax_due, 2), round(taxable_income, 2), insights))
         conn.commit()
 
     # Pass all correct values to the template

@@ -58,6 +58,14 @@
     </aside>
 
     <main class="main-content">
+        <!-- Add this debug section to your dashboard templates -->
+        <div class="debug-info" style="background: #f0f0f0; padding: 10px; margin: 10px 0; display: none;">
+            <strong>Debug Info:</strong>
+            PAN: {{ pan_number }}<br>
+            Total Calculations: {{ total_calculations }}<br>
+            Labels: {{ labels }}<br>
+            Data Points: {{ gross_income_data }}
+        </div>
         <section id="dashboard-content" class="page-content">
             <h1>Dashboard</h1>
             <p>Welcome to your main dashboard. Here is a summary of your yearly revenue and taxes.</p>
@@ -73,104 +81,118 @@
                     <canvas id="netPayableTaxChart"></canvas>
                 </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Data from backend
-            const yearlyLabels = {{ labels | tojson }};
-            const yearlyRevenueData = {{ gross_income_data | tojson }};
-            const yearlyTaxData = {{ tax_data | tojson }};
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        // Data from backend - ALL calculations
+                        const calculationLabels = {{ labels | tojson
+                    }};
+                    const grossIncomeData = {{ gross_income_data | tojson }};
+                    const taxData = {{ tax_data | tojson }};
+                    const netIncomeData = {{ net_income_data | tojson }};
 
-            // 1. Annual Gross Income (Line Chart)
-            const revenueCtx = document.getElementById('revenuePieChart').getContext('2d');
-            const revenueLineChart = new Chart(revenueCtx, {
-                type: 'line',
-                data: {
-                    labels: yearlyLabels,
-                    datasets: [{
-                        label: 'Annual Gross Income',
-                        data: yearlyRevenueData,
-                        fill: true,
-                        backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                        borderColor: 'rgba(0, 123, 255, 1)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
+                    // 1. All Calculations - Gross Income (Line Chart)
+                    const revenueCtx = document.getElementById('revenuePieChart').getContext('2d');
+                    const revenueLineChart = new Chart(revenueCtx, {
+                        type: 'line',
+                        data: {
+                            labels: calculationLabels,
+                            datasets: [{
+                                label: 'Gross Income',
+                                data: grossIncomeData,
+                                fill: true,
+                                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                                borderColor: 'rgba(0, 123, 255, 1)',
+                                tension: 0.1
+                            }, {
+                                label: 'Net Income',
+                                data: netIncomeData,
+                                fill: true,
+                                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                                borderColor: 'rgba(40, 167, 69, 1)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
                         }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+                    });
 
-            // 2. Yearly Tax Paid (Bar Chart)
-            const taxCtx = document.getElementById('netPayableTaxChart').getContext('2d');
-            const netPayableTaxChart = new Chart(taxCtx, {
-                type: 'bar',
-                data: {
-                    labels: yearlyLabels,
-                    datasets: [{
-                        label: 'Tax Paid (₹)',
-                        data: yearlyTaxData,
-                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
-                        borderColor: 'rgba(40, 167, 69, 1)',
-                        borderWidth: 1,
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    // 2. All Calculations - Tax Paid (Bar Chart)
+                    const taxCtx = document.getElementById('netPayableTaxChart').getContext('2d');
+                    const netPayableTaxChart = new Chart(taxCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: calculationLabels,
+                            datasets: [{
+                                label: 'Tax Paid (₹)',
+                                data: taxData,
+                                backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                                borderColor: 'rgba(220, 53, 69, 1)',
+                                borderWidth: 1,
+                                borderRadius: 5
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
                         }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false,
-                        }
-                    }
-                }
-            });
-        });
-    </script>
+                    });
+                </script>
                 {% else %}
-                <p>NO Graphs to display</p>
+                <p>No calculations found. Complete your first tax calculation to see graphs here.</p>
                 {% endif %}
             </div>
         </section>
 
         <section id="history-content" class="page-content" style="display: none;">
             <h1>Filing History</h1>
-            {% if history %}
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background-color: #f8f9fa;">
-                        <th style="border: 1px solid #ddd; padding: 8px;">Date</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Gross Income</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Tax Paid</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in history %}
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">{{ item.date }}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">₹{{ item.gross_income }}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">₹{{ item.tax }}</td>
-                    </tr>
+
+            <!-- Enhanced History Section -->
+            <div class="history-section">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Calculation History (Total: {{ total_calculations }})
+                </h3>
+
+                {% if history %}
+                <div class="history-list">
+                    {% for calc in history %}
+                    <div class="history-item">
+                        <div class="history-header">
+                            <strong>Calculation #{{ loop.index }} - {{ calc.financial_year }}</strong>
+                            <span class="history-date">{{ calc.date }}</span>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-row">
+                                <span>Gross Income: ₹{{ "%.2f"|format(calc.gross_income) }}</span>
+                                <span>Tax: ₹{{ "%.2f"|format(calc.tax) }}</span>
+                                <span>Net Income: ₹{{ "%.2f"|format(calc.net_income) }}</span>
+                            </div>
+                            {% if calc.insights and calc.insights != "Could not generate AI insights at this time." %}
+                            <div class="history-insights">
+                                <strong>AI Insights:</strong>
+                                <p>{{ calc.insights }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p>No filing history available.</p>
-            {% endif %}
+                </div>
+                {% else %}
+                <div class="no-history">
+                    <p>No tax calculations found. Complete your first tax calculation to see history here.</p>
+                </div>
+                {% endif %}
+            </div>
+            <!-- End Enhanced History Section -->
+
         </section>
 
         <section id="file-tax-content" class="page-content" style="display: none;">

@@ -5,11 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Financial Overview</title>
-    
+
     <link rel="stylesheet" href="/static/dash_bus.css">
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -57,6 +58,10 @@
     </aside>
 
     <main class="main-content">
+        <div class="user-info">
+            <h2><i class="fa-solid fa-building"></i> Business Dashboard - PAN: {{ pan_number }}</h2>
+            <p>Your Business Tax History & Analytics</p>
+        </div>
         <section id="dashboard-content" class="page-content">
             <h1>Financial Overview</h1>
             <p>Welcome! Here is a summary of your recent financial data.</p>
@@ -70,118 +75,125 @@
                     <h2>Annual Revenue</h2>
                     <canvas id="annualRevenueChart"></canvas>
                 </div>
-                  <div class="chart-wrapper">
+                <div class="chart-wrapper">
                     <h2>Tax Payable</h2>
                     <canvas id="taxPayableChart"></canvas>
                 </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Data from backend
-            const labels = {{ labels | tojson }};
-            const revenueData = {{ revenue_data | tojson }};
-            const gstData = {{ gst_data | tojson }};
-            const taxData = {{ tax_data | tojson }};
-
-            // Monthly GST Payable (Line Chart)
-            const gstCtx = document.getElementById('monthlyGstChart').getContext('2d');
-            const gstChart = new Chart(gstCtx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'GST Payable',
-                        data: gstData,
-                        borderColor: 'rgba(255, 193, 7, 1)',
-                        backgroundColor: 'rgba(255, 193, 7, 0.2)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-
-            // Annual Revenue (Bar Chart)
-            const revenueCtx = document.getElementById('annualRevenueChart').getContext('2d');
-            const revenueChart = new Chart(revenueCtx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Annual Revenue',
-                        data: revenueData,
-                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
-                        borderColor: 'rgba(40, 167, 69, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-
-            // Tax Payable (Bar Chart)
-            const taxCtx = document.getElementById('taxPayableChart').getContext('2d');
-            const taxChart = new Chart(taxCtx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Tax Payable',
-                        data: taxData,
-                        backgroundColor: 'rgba(220, 53, 69, 0.6)',
-                        borderColor: 'rgba(220, 53, 69, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        });
-    </script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        // Data from backend - ALL calculations
+                        const calculationLabels = {{ labels | tojson }};
+                        const revenueData = {{ revenue_data | tojson }};
+                        const gstData = {{ gst_data | tojson }};
+                        const taxData = {{ tax_data | tojson }};
+            
+                        // All Calculations - GST Payable (Line Chart)
+                        const gstCtx = document.getElementById('monthlyGstChart').getContext('2d');
+                        const gstChart = new Chart(gstCtx, {
+                            type: 'line',
+                            data: {
+                                labels: calculationLabels,
+                                datasets: [{
+                                    label: 'GST Payable',
+                                    data: gstData,
+                                    borderColor: 'rgba(255, 193, 7, 1)',
+                                    backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                                    tension: 0.1
+                                }]
+                            },
+                            options: {
+                                responsive: true
+                            }
+                        });
+            
+                        // All Calculations - Revenue (Bar Chart)
+                        const revenueCtx = document.getElementById('annualRevenueChart').getContext('2d');
+                        const revenueChart = new Chart(revenueCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: calculationLabels,
+                                datasets: [{
+                                    label: 'Revenue',
+                                    data: revenueData,
+                                    backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                                    borderColor: 'rgba(40, 167, 69, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true
+                            }
+                        });
+            
+                        // All Calculations - Tax Payable (Bar Chart)
+                        const taxCtx = document.getElementById('taxPayableChart').getContext('2d');
+                        const taxChart = new Chart(taxCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: calculationLabels,
+                                datasets: [{
+                                    label: 'Tax Payable',
+                                    data: taxData,
+                                    backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                                    borderColor: 'rgba(220, 53, 69, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true
+                            }
+                        });
+                    });
+                </script>
                 {% else %}
-                <p>NO Graphs to display</p>
+                <p>No business calculations found. Complete your first business tax calculation to see graphs here.</p>
                 {% endif %}
             </div>
         </section>
 
         <section id="history-content" class="page-content" style="display: none;">
             <h1>Filing History</h1>
-            {% if history %}
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="background-color: #f8f9fa;">
-                        <th style="border: 1px solid #ddd; padding: 8px;">Date</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Gross Income</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">GST Payable</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Tax Payable</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in history %}
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">{{ item.date }}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">₹{{ item.gross_income }}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">₹{{ item.gst_payable }}</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">₹{{ item.final_tax_payable }}</td>
-                    </tr>
+            
+            <!-- Enhanced Business History Section -->
+            <div class="history-section">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Business Calculation History (Total: {{ total_calculations }})</h3>
+                
+                {% if history %}
+                <div class="history-list">
+                    {% for calc in history %}
+                    <div class="history-item">
+                        <div class="history-header">
+                            <strong>Calculation #{{ loop.index }}</strong>
+                            <span class="history-date">{{ calc.date }}</span>
+                        </div>
+                        <div class="history-details">
+                            <div class="history-row">
+                                <span>Gross Income: ₹{{ "%.2f"|format(calc.gross_income) }}</span>
+                                <span>Net Taxable: ₹{{ "%.2f"|format(calc.net_taxable_income) }}</span>
+                            </div>
+                            <div class="history-row">
+                                <span>GST Payable: ₹{{ "%.2f"|format(calc.gst_payable) }}</span>
+                                <span>Final Tax: ₹{{ "%.2f"|format(calc.final_tax_payable) }}</span>
+                            </div>
+                            {% if calc.insights and calc.insights != "Could not generate AI insights at this time." %}
+                            <div class="history-insights">
+                                <strong>AI Insights:</strong>
+                                <p>{{ calc.insights }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p>No filing history available.</p>
-            {% endif %}
+                </div>
+                {% else %}
+                <div class="no-history">
+                    <p>No business tax calculations found. Complete your first business tax calculation to see history here.</p>
+                </div>
+                {% endif %}
+            </div>
+            <!-- End Enhanced Business History Section -->
+
         </section>
 
         <section id="file-tax-content" class="page-content" style="display: none;">
