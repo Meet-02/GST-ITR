@@ -103,7 +103,7 @@
                 <h1><i class="fa-solid fa-user"></i> User Details</h1>
 
                 <!-- ✅ FORM START -->
-                <form action="{{ url_for('common_details') }}" method="POST">
+                <form action="{{ url_for('details') }}" method="POST">
 
                     <label class="field-label" for="name"><i class="fa-solid fa-id-badge"></i> Name <span
                             class="asterisk">*</span></label>
@@ -139,7 +139,7 @@
                     <input type="number" class="input-field" id="mno" name="mno" maxlength="10" required>
 
                     <!-- Business Section -->
-                    {% if session.get('user_category') == 'business' or True %}
+                    {% if session.get('user_category') == 'business' %}
                     <section id="infobusiness">
                         <h2><i class="fa-solid fa-building"></i> For Businesses</h2>
 

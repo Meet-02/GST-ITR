@@ -30,3 +30,18 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const ctx = document.getElementById("jobChart").getContext("2d");
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: ["Gross Income", "Deductions", "Net Income", "Tax"],
+            datasets: [{
+                label: "Income Overview",
+                data: [gross_income, deductions, net_income, tax],
+                backgroundColor: ["#36A2EB", "#FF6384", "#4BC0C0", "#FFCE56"],
+            }]
+        }
+    });
+});

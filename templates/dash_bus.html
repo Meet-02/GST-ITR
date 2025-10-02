@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
 </head>
 
 <body>
@@ -82,68 +82,88 @@
 
                 <script>
                     document.addEventListener("DOMContentLoaded", function () {
+                        console.log("Chart JS loading");
                         // Data from backend - ALL calculations
                         const calculationLabels = {{ labels | tojson }};
                         const revenueData = {{ revenue_data | tojson }};
                         const gstData = {{ gst_data | tojson }};
                         const taxData = {{ tax_data | tojson }};
+                        console.log("Labels:", calculationLabels);
+                        console.log("Revenue:", revenueData);
+                        console.log("GST:", gstData);
+                        console.log("Tax:", taxData);
             
                         // All Calculations - GST Payable (Line Chart)
-                        const gstCtx = document.getElementById('monthlyGstChart').getContext('2d');
-                        const gstChart = new Chart(gstCtx, {
-                            type: 'line',
-                            data: {
-                                labels: calculationLabels,
-                                datasets: [{
-                                    label: 'GST Payable',
-                                    data: gstData,
-                                    borderColor: 'rgba(255, 193, 7, 1)',
-                                    backgroundColor: 'rgba(255, 193, 7, 0.2)',
-                                    tension: 0.1
-                                }]
-                            },
-                            options: {
-                                responsive: true
-                            }
-                        });
+                        try {
+                            const gstCtx = document.getElementById('monthlyGstChart').getContext('2d');
+                            const gstChart = new Chart(gstCtx, {
+                                type: 'line',
+                                data: {
+                                    labels: calculationLabels,
+                                    datasets: [{
+                                        label: 'GST Payable',
+                                        data: gstData,
+                                        borderColor: 'rgba(255, 193, 7, 1)',
+                                        backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                                        tension: 0.1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true
+                                }
+                            });
+                            console.log("GST Chart created successfully");
+                        } catch (error) {
+                            console.error("Error creating GST chart:", error);
+                        }
             
                         // All Calculations - Revenue (Bar Chart)
-                        const revenueCtx = document.getElementById('annualRevenueChart').getContext('2d');
-                        const revenueChart = new Chart(revenueCtx, {
-                            type: 'bar',
-                            data: {
-                                labels: calculationLabels,
-                                datasets: [{
-                                    label: 'Revenue',
-                                    data: revenueData,
-                                    backgroundColor: 'rgba(40, 167, 69, 0.6)',
-                                    borderColor: 'rgba(40, 167, 69, 1)',
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                responsive: true
-                            }
-                        });
+                        try {
+                            const revenueCtx = document.getElementById('annualRevenueChart').getContext('2d');
+                            const revenueChart = new Chart(revenueCtx, {
+                                type: 'bar',
+                                data: {
+                                    labels: calculationLabels,
+                                    datasets: [{
+                                        label: 'Revenue',
+                                        data: revenueData,
+                                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                                        borderColor: 'rgba(40, 167, 69, 1)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true
+                                }
+                            });
+                            console.log("Revenue Chart created successfully");
+                        } catch (error) {
+                            console.error("Error creating Revenue chart:", error);
+                        }
             
                         // All Calculations - Tax Payable (Bar Chart)
-                        const taxCtx = document.getElementById('taxPayableChart').getContext('2d');
-                        const taxChart = new Chart(taxCtx, {
-                            type: 'bar',
-                            data: {
-                                labels: calculationLabels,
-                                datasets: [{
-                                    label: 'Tax Payable',
-                                    data: taxData,
-                                    backgroundColor: 'rgba(220, 53, 69, 0.6)',
-                                    borderColor: 'rgba(220, 53, 69, 1)',
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                responsive: true
-                            }
-                        });
+                        try {
+                            const taxCtx = document.getElementById('taxPayableChart').getContext('2d');
+                            const taxChart = new Chart(taxCtx, {
+                                type: 'bar',
+                                data: {
+                                    labels: calculationLabels,
+                                    datasets: [{
+                                        label: 'Tax Payable',
+                                        data: taxData,
+                                        backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                                        borderColor: 'rgba(220, 53, 69, 1)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true
+                                }
+                            });
+                            console.log("Tax Chart created successfully");
+                        } catch (error) {
+                            console.error("Error creating Tax chart:", error);
+                        }
                     });
                 </script>
                 {% else %}

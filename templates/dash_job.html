@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
 </head>
 
 <body>
@@ -91,61 +91,71 @@
                     const netIncomeData = {{ net_income_data | tojson }};
 
                     // 1. All Calculations - Gross Income (Line Chart)
-                    const revenueCtx = document.getElementById('revenuePieChart').getContext('2d');
-                    const revenueLineChart = new Chart(revenueCtx, {
-                        type: 'line',
-                        data: {
-                            labels: calculationLabels,
-                            datasets: [{
-                                label: 'Gross Income',
-                                data: grossIncomeData,
-                                fill: true,
-                                backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                                borderColor: 'rgba(0, 123, 255, 1)',
-                                tension: 0.1
-                            }, {
-                                label: 'Net Income',
-                                data: netIncomeData,
-                                fill: true,
-                                backgroundColor: 'rgba(40, 167, 69, 0.2)',
-                                borderColor: 'rgba(40, 167, 69, 1)',
-                                tension: 0.1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true
+                    try {
+                        const revenueCtx = document.getElementById('revenuePieChart').getContext('2d');
+                        const revenueLineChart = new Chart(revenueCtx, {
+                            type: 'line',
+                            data: {
+                                labels: calculationLabels,
+                                datasets: [{
+                                    label: 'Gross Income',
+                                    data: grossIncomeData,
+                                    fill: true,
+                                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                                    borderColor: 'rgba(0, 123, 255, 1)',
+                                    tension: 0.1
+                                }, {
+                                    label: 'Net Income',
+                                    data: netIncomeData,
+                                    fill: true,
+                                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                                    borderColor: 'rgba(40, 167, 69, 1)',
+                                    tension: 0.1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                        console.log("Revenue Line Chart created successfully");
+                    } catch (error) {
+                        console.error("Error creating Revenue chart:", error);
+                    }
 
                     // 2. All Calculations - Tax Paid (Bar Chart)
-                    const taxCtx = document.getElementById('netPayableTaxChart').getContext('2d');
-                    const netPayableTaxChart = new Chart(taxCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: calculationLabels,
-                            datasets: [{
-                                label: 'Tax Paid (₹)',
-                                data: taxData,
-                                backgroundColor: 'rgba(220, 53, 69, 0.6)',
-                                borderColor: 'rgba(220, 53, 69, 1)',
-                                borderWidth: 1,
-                                borderRadius: 5
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true
+                    try {
+                        const taxCtx = document.getElementById('netPayableTaxChart').getContext('2d');
+                        const netPayableTaxChart = new Chart(taxCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: calculationLabels,
+                                datasets: [{
+                                    label: 'Tax Paid (₹)',
+                                    data: taxData,
+                                    backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                                    borderColor: 'rgba(220, 53, 69, 1)',
+                                    borderWidth: 1,
+                                    borderRadius: 5
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                        console.log("Tax Bar Chart created successfully");
+                    } catch (error) {
+                        console.error("Error creating Tax chart:", error);
+                    }
                 </script>
                 {% else %}
                 <p>No calculations found. Complete your first tax calculation to see graphs here.</p>
@@ -200,8 +210,13 @@
             <p>The form for filing a new ITR or GST return will be placed here.</p>
         </section>
     </main>
-
-    <script src="/static/dash_job.js"></script>
+    <script>
+        const gross_income = {{ gross_income| tojson }};
+        const deductions = {{ deductions| tojson }};
+        const net_income = {{ net_income| tojson }};
+        const tax = {{ tax| tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='dash_job.js') }}"></script>
 </body>
 
 </html>
