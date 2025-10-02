@@ -7,6 +7,66 @@
     <title>User Details - GST & ITR</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='pg2.css') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* --- STEPPER STYLES --- */
+        .stepper {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 550px;
+            margin: 0 auto 25px auto;
+        }
+
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e5e7eb;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .stepper-progress {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 4px;
+            background-color: #28a745;
+            width: 100%;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step.completed {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .step.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        /* --- END STEPPER STYLES --- */
+    </style>
 </head>
 
 <body>
@@ -26,9 +86,11 @@
     <div class="stepper">
         <div class="step completed" data-step="1">1</div>
         <div class="line"></div>
-        <div class="step active" data-step="2">2</div>
+        <div class="step completed" data-step="2">2</div>
         <div class="line"></div>
-        <div class="step" data-step="3">3</div>
+        <div class="step active" data-step="3">3</div>
+        <div class="line"></div>
+        <div class="step" data-step="4">4</div>
     </div>
 
     <div class="outer-container">

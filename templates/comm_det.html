@@ -7,6 +7,67 @@
     <title>User Details - GST & ITR</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='page1.css') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* --- STEPPER STYLES --- */
+        .stepper {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 550px;
+            margin: 0 auto 25px auto;
+        }
+
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #e5e7eb;
+            transform: translateY(-50%);
+            z-index: 0;
+        }
+
+        .stepper-progress {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 4px;
+            background-color: #28a745;
+            width: 100%;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+
+        .step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step.completed {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .step.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        /* --- END STEPPER STYLES --- */
+    </style>
 </head>
 
 <body>
@@ -25,7 +86,7 @@
         <p>Fill in your details to get started with a smooth and hassle-free process.</p>
     </div>
 
-    <!-- <div class="stepper">
+    <div class="stepper">
         <div class="step active" data-step="1">1</div>
         <div class="line"></div>
         <div class="step" data-step="2">2</div>
@@ -33,7 +94,7 @@
         <div class="step" data-step="3">3</div>
         <div class="line"></div>
         <div class="step" data-step="4">4</div>
-    </div> -->
+    </div>
 
     <!-- Main Form -->
     <div class="outer-container">
@@ -44,16 +105,20 @@
                 <!-- ✅ FORM START -->
                 <form action="{{ url_for('common_details') }}" method="POST">
 
-                    <label class="field-label" for="name"><i class="fa-solid fa-id-badge"></i> Name <span class="asterisk">*</span></label>
+                    <label class="field-label" for="name"><i class="fa-solid fa-id-badge"></i> Name <span
+                            class="asterisk">*</span></label>
                     <input type="text" class="input-field" id="name" name="name" required>
 
-                    <label class="field-label" for="father"><i class="fa-solid fa-user-group"></i> Father’s / Guardian’s Name <span class="asterisk">*</span></label>
+                    <label class="field-label" for="father"><i class="fa-solid fa-user-group"></i> Father’s / Guardian’s
+                        Name <span class="asterisk">*</span></label>
                     <input type="text" class="input-field" id="father" name="father" required>
 
-                    <label class="field-label" for="dob"><i class="fa-solid fa-calendar"></i> Date of Birth <span class="asterisk">*</span></label>
+                    <label class="field-label" for="dob"><i class="fa-solid fa-calendar"></i> Date of Birth <span
+                            class="asterisk">*</span></label>
                     <input type="date" class="input-field" id="dob" name="dob" required>
 
-                    <label class="field-label" for="gender"><i class="fa-solid fa-venus-mars"></i> Gender <span class="asterisk">*</span></label>
+                    <label class="field-label" for="gender"><i class="fa-solid fa-venus-mars"></i> Gender <span
+                            class="asterisk">*</span></label>
                     <select class="input-field" id="gender" name="gender" required>
                         <option value="" selected disabled>Select</option>
                         <option>Male</option>
@@ -61,28 +126,28 @@
                         <option>Other</option>
                     </select>
 
-                    <label class="field-label" for="email"><i class="fa-solid fa-envelope"></i> Email Address <span class="asterisk">*</span></label>
+                    <label class="field-label" for="email"><i class="fa-solid fa-envelope"></i> Email Address <span
+                            class="asterisk">*</span></label>
                     <input type="email" class="input-field" id="email" name="email" required>
 
-                    <label class="field-label" for="aadhar"><i class="fa-solid fa-address-card"></i> Aadhar Number <span class="asterisk">*</span></label>
+                    <label class="field-label" for="aadhar"><i class="fa-solid fa-address-card"></i> Aadhar Number <span
+                            class="asterisk">*</span></label>
                     <input type="number" class="input-field" id="aadhar" name="aadhar" maxlength="12" required>
 
-                    <label class="field-label" for="mno"><i class="fa-solid fa-phone"></i> Mobile Number <span class="asterisk">*</span></label>
+                    <label class="field-label" for="mno"><i class="fa-solid fa-phone"></i> Mobile Number <span
+                            class="asterisk">*</span></label>
                     <input type="number" class="input-field" id="mno" name="mno" maxlength="10" required>
 
-                    <!-- Category Selection -->
-                    <p class="section-title"><i class="fa-solid fa-briefcase"></i> Select your category:</p>
-                    <label><input type="radio" name="userType" value="Job Person"> Job Person</label>
-                    <label><input type="radio" name="userType" value="Business Person"> Business Person</label>
-
                     <!-- Business Section -->
-                    <section id="infobusiness" class="hidden-section">
+                    {% if session.get('user_category') == 'business' or True %}
+                    <section id="infobusiness">
                         <h2><i class="fa-solid fa-building"></i> For Businesses</h2>
 
                         <label class="field-label" for="Bussname">Business Name<span class="asterisk">*</span></label>
                         <input type="text" class="input-field" id="Bussname" name="Bussname">
 
-                        <label class="field-label" for="DOR">Date of GST Registration<span class="asterisk">*</span></label>
+                        <label class="field-label" for="DOR">Date of GST Registration<span
+                                class="asterisk">*</span></label>
                         <input type="date" class="input-field" id="DOR" name="DOR">
 
                         <label class="field-label" for="GSTIN">GSTIN<span class="asterisk">*</span></label>
@@ -105,8 +170,8 @@
                         </select>
                     </section>
 
-                    <!-- Job Section -->
-                    <section id="infojob" class="hidden-section">
+                    {% elif session.get('user_category') == 'job' %}
+                    <section id="infojob">
                         <h2><i class="fa-solid fa-user-tie"></i> For Job</h2>
 
                         <label class="field-label" for="empc">Employer Category<span class="asterisk">*</span></label>
@@ -122,6 +187,7 @@
                         <label class="field-label" for="tan">Employer TAN Number <span class="asterisk">*</span></label>
                         <input type="text" class="input-field" id="tan" name="tan">
                     </section>
+                    {% endif %}
 
                     <div class="button">
                         <button type="submit">
@@ -136,7 +202,27 @@
             </div>
         </div>
     </div>
-
-    <script src="{{ url_for('static', filename='pg1.js') }}"></script>
+    <script>
+        // Only include specific JavaScript functions needed for this page
+        // Remove the section hiding logic that's in pg1.js
+        
+        // Keep only the necessary functions like the header scroll behavior
+        const header = document.getElementById('header');
+        const formSection = document.querySelector('.form-section');
+    
+        window.addEventListener('scroll', () => {
+            const formTop = formSection.offsetTop;
+            const headerHeight = header.offsetHeight;
+    
+            if (window.scrollY >= formTop - headerHeight - 10) {
+                header.style.position = 'absolute';
+                header.style.top = (formTop - headerHeight - 10) + 'px';
+            } else {
+                header.style.position = 'fixed';
+                header.style.top = '10px';
+            }
+        });
+    </script>
 </body>
+
 </html>

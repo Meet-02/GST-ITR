@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, flash, url_for, session
+from flask import Flask, request, render_template, redirect, flash, url_for, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 from calc_job import calc_job_tax_new_regime  
@@ -42,8 +42,99 @@ def landing():
 def sign_up():
     return render_template('sign-up.html')
 
+@app.route('/category')
+def category():
+    return render_template('category.html')
+
+@app.route('/select_category', methods=['POST'])
+def select_category():
+    data = request.get_json()
+    category = data.get('category')
+    session['user_category'] = category
+    if category == 'job':
+        redirect_url = url_for('dashboard_job')
+    elif category == 'business':
+        redirect_url = url_for('dashboard_business')
+    else:
+        redirect_url = url_for('category')
+    return jsonify({'success': True, 'redirect': redirect_url})
+
+@app.route('/dashboard/job')
+def dashboard_job():
+    # Fetch data for job dashboard
+    person_id = session.get('person_id')
+    if not person_id:
+        return redirect(url_for('details'))
+
+    # Fetch tax results grouped by year
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT strftime('%Y', created_at) as year, SUM(gross_income) as total_gross, AVG(tax) as avg_tax
+            FROM tax_results_job
+            WHERE person_id = ?
+            GROUP BY strftime('%Y', created_at)
+            ORDER BY year DESC
+        ''', (person_id,))
+        yearly_data = cursor.fetchall()
+
+        # Fetch all history
+        cursor.execute('SELECT gross_income, tax, created_at FROM tax_results_job WHERE person_id = ? ORDER BY created_at DESC', (person_id,))
+        all_results = cursor.fetchall()
+
+    # Prepare data for charts
+    labels = [row[0] for row in yearly_data] if yearly_data else []
+    gross_income_data = [row[1] for row in yearly_data] if yearly_data else []
+    tax_data = [row[2] for row in yearly_data] if yearly_data else []
+
+    # Fetch history
+    history = [{'date': row[2], 'gross_income': row[0], 'tax': row[1]} for row in all_results]
+
+    return render_template('dash_job.html', labels=labels, gross_income_data=gross_income_data, tax_data=tax_data, history=history)
+
+@app.route('/dashboard/business')
+def dashboard_business():
+    # Fetch data for business dashboard
+    person_id = session.get('person_id')
+    if not person_id:
+        return redirect(url_for('details'))
+
+    # Fetch tax results grouped by year
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT strftime('%Y', created_at) as year, SUM(gross_income) as total_revenue, AVG(gst_payable) as avg_gst, AVG(final_tax_payable) as avg_tax
+            FROM tax_results_business
+            WHERE person_id = ?
+            GROUP BY strftime('%Y', created_at)
+            ORDER BY year DESC
+        ''', (person_id,))
+        yearly_data = cursor.fetchall()
+
+        # Fetch all history
+        cursor.execute('SELECT gross_income, gst_payable, final_tax_payable, created_at FROM tax_results_business WHERE person_id = ? ORDER BY created_at DESC', (person_id,))
+        all_results = cursor.fetchall()
+
+    # Prepare data for charts
+    labels = [row[0] for row in yearly_data] if yearly_data else []
+    revenue_data = [row[1] for row in yearly_data] if yearly_data else []
+    gst_data = [row[2] for row in yearly_data] if yearly_data else []
+    tax_data = [row[3] for row in yearly_data] if yearly_data else []
+
+    # Fetch history
+    history = [{'date': row[3], 'gross_income': row[0], 'gst_payable': row[1], 'final_tax_payable': row[2]} for row in all_results]
+
+    return render_template('dash_bus.html', labels=labels, revenue_data=revenue_data, gst_data=gst_data, tax_data=tax_data, history=history)
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('sign_up'))
+
 @app.route('/details')
 def details():
+    if 'user_category' not in session:
+        return redirect(url_for('category'))
     return render_template('comm_det.html')
 
 @app.route('/details/Business')
@@ -89,8 +180,9 @@ def signup():
         try:
             cursor.execute('INSERT INTO user (PAN_ID, Password) VALUES (?, ?)', (pan, generate_password_hash(password)))
             conn.commit()
+            session['pan'] = pan
             flash("Signup successful")
-            return redirect(url_for('common_details'))
+            return redirect(url_for('category'))
         except sqlite3.IntegrityError:
             flash("PAN number already exists")
             return render_template('sign-up.html') 
@@ -111,7 +203,8 @@ def login():
             stored_hash = user[2]  
             if check_password_hash(stored_hash, password):
                 flash("Login successful")
-                return redirect(url_for('common_details'))
+                session['pan'] = pan
+                return redirect(url_for('category'))
             else:
                 flash("Invalid password")
         else:
@@ -130,7 +223,7 @@ def common_details():
     Email = request.form.get('email')
     Aadhar = request.form.get('aadhar')
     Mobile = request.form.get('mno')
-    category = request.form.get('userType')
+    category = session.get('user_category')
 
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
@@ -145,7 +238,7 @@ def common_details():
         
         session['person_id'] = person_id 
 
-        if category == "Job Person":
+        if category == "job":
             employer_category = request.form.get('empc')
             employer_tan = request.form.get('tan')
             cursor.execute('''
@@ -153,7 +246,7 @@ def common_details():
                 VALUES (?, ?, ?)
             ''', (person_id, employer_category, employer_tan))
 
-        elif category == "Business Person":
+        elif category == "business":
             business_name = request.form.get('Bussname')
             gst_date = request.form.get('DOR')
             gstin = request.form.get('GSTIN')
@@ -168,17 +261,14 @@ def common_details():
         conn.commit()
         flash("Details submitted successfully!")
 
-        if category == "Business Person":
+        if category == "business":
             return redirect(url_for("business"))
-        elif category == "Job Person":
+        elif category == "job":
             return redirect(url_for("job_det"))
         else:
             flash("Please select a valid category")
             return redirect(url_for("details"))
 
-
-# In app.py, DELETE your existing 'businessdet', 'bussdeduct', 
-# and 'bus_result' functions and REPLACE them with this block:
 
 # Handles the submission from the business income/details form
 @app.route('/details/Business', methods=['POST'])

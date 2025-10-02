@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ITR & GST</title>
+    <link rel="stylesheet" href="/static/dash_job.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <div class="logo-placeholder">
+                    <img src="/static/IMAGES/Untitled_2-removebg-preview.png" alt="ITR & GST Logo">
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" data-page="dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" data-page="history">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/details" class="nav-link">
+                            <i class="fas fa-file-alt"></i>
+                            <span>File Tax</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="logout-section">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="/logout" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <section id="dashboard-content" class="page-content">
+            <h1>Dashboard</h1>
+            <p>Welcome to your main dashboard. Here is a summary of your yearly revenue and taxes.</p>
+
+            <div class="charts-container">
+                {% if labels %}
+                <div class="chart-wrapper">
+                    <h2>Annual Gross Income</h2>
+                    <canvas id="revenuePieChart"></canvas>
+                </div>
+                <div class="chart-wrapper">
+                    <h2>Yearly Tax Paid</h2>
+                    <canvas id="netPayableTaxChart"></canvas>
+                </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Data from backend
+            const yearlyLabels = {{ labels | tojson }};
+            const yearlyRevenueData = {{ gross_income_data | tojson }};
+            const yearlyTaxData = {{ tax_data | tojson }};
+
+            // 1. Annual Gross Income (Line Chart)
+            const revenueCtx = document.getElementById('revenuePieChart').getContext('2d');
+            const revenueLineChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: yearlyLabels,
+                    datasets: [{
+                        label: 'Annual Gross Income',
+                        data: yearlyRevenueData,
+                        fill: true,
+                        backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                        borderColor: 'rgba(0, 123, 255, 1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 2. Yearly Tax Paid (Bar Chart)
+            const taxCtx = document.getElementById('netPayableTaxChart').getContext('2d');
+            const netPayableTaxChart = new Chart(taxCtx, {
+                type: 'bar',
+                data: {
+                    labels: yearlyLabels,
+                    datasets: [{
+                        label: 'Tax Paid (₹)',
+                        data: yearlyTaxData,
+                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                        borderColor: 'rgba(40, 167, 69, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false,
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+                {% else %}
+                <p>NO Graphs to display</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section id="history-content" class="page-content" style="display: none;">
+            <h1>Filing History</h1>
+            {% if history %}
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #f8f9fa;">
+                        <th style="border: 1px solid #ddd; padding: 8px;">Date</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Gross Income</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Tax Paid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">{{ item.date }}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">₹{{ item.gross_income }}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">₹{{ item.tax }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No filing history available.</p>
+            {% endif %}
+        </section>
+
+        <section id="file-tax-content" class="page-content" style="display: none;">
+            <h1>File a New Tax Return</h1>
+            <p>The form for filing a new ITR or GST return will be placed here.</p>
+        </section>
+    </main>
+
+    <script src="/static/dash_job.js"></script>
+</body>
+
+</html>

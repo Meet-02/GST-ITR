@@ -184,6 +184,7 @@
             <div class="step completed">1</div>
             <div class="step completed">2</div>
             <div class="step completed">3</div>
+            <div class="step active">4</div>
         </div>
         <div class="tax-card">
             <div class="card-header">
@@ -210,6 +211,8 @@
 
             <div class="download-area">
                 <a href="{{ url_for('download_business_report') }}" class="download-btn">Download as PDF</a>
+                <br><br>
+                <a href="{{ url_for('dashboard_business') }}" class="download-btn" style="background-color: #007bff;">Back to Dashboard</a>
             </div>
             {% if insights %}
             <div class="insights-card">
