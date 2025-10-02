@@ -22,107 +22,53 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // --- CHART CREATION LOGIC ---
+    // The variables chartLabels, revenueData, etc., are defined in the HTML script tag
 
-    // 1. Data for Monthly GST Payable (Line Graph)
-    const monthlyGstLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthlyGstData = [12000, 15000, 11000, 18000, 16000, 21000, 19000, 22000, 25000, 23000, 28000, 31000];
-
-    // 2. Data for Annual Revenue (Bar Graph)
-    const annualRevenueLabels = ['2022', '2023', '2024', '2025'];
-    const annualRevenueData = [950000, 1100000, 1050000, 1250000];
-
-    // 3. Data for Tax Payable
-    const taxPayableYears = ['2022', '2023', '2024', '2025'];
-    const taxPayableData = [105000, 120000, 115000, 140000];
-
-
-    // --- CHART INITIALIZATION ---
-
-    // 1. Monthly GST Payable (Line Chart)
-    const gstCtx = document.getElementById('monthlyGstChart').getContext('2d');
-    new Chart(gstCtx, {
-        type: 'line',
-        data: {
-            labels: monthlyGstLabels,
-            datasets: [{
-                label: 'GST Payable (₹)',
-                data: monthlyGstData,
-                fill: true,
-                backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                borderColor: 'rgba(0, 123, 255, 1)',
-                tension: 0.2
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-
-    // 2. Annual Revenue (Bar Chart)
-    const revenueCtx = document.getElementById('annualRevenueChart').getContext('2d');
-    new Chart(revenueCtx, {
-        type: 'bar',
-        data: {
-            labels: annualRevenueLabels,
-            datasets: [{
-                label: 'Revenue (₹)',
-                data: annualRevenueData,
-                backgroundColor: 'rgba(40, 167, 69, 0.7)',
-                borderColor: 'rgba(40, 167, 69, 1)',
-                borderWidth: 1,
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-
-    // 3. Tax Payable (Dotted Line Graph) - AXES SWAPPED
-    const taxCtx = document.getElementById('taxPayableChart').getContext('2d');
-    new Chart(taxCtx, {
-        type: 'line',
-        data: {
-            labels: taxPayableYears, // Labels for the x-axis
-            datasets: [{
-                label: 'Tax Payable (₹)',
-                data: taxPayableData, // Data for the y-axis
-                borderColor: 'rgba(220, 53, 69, 1)',
-                pointBackgroundColor: 'rgba(220, 53, 69, 1)',
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                borderDash: [5, 5],
-                fill: false,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
+    // 1. Revenue Trend Chart (Bar)
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx && typeof chartLabels !== 'undefined' && chartLabels.length > 0) {
+        new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Gross Revenue (₹)',
+                    data: revenueData,
+                    backgroundColor: 'rgba(40, 167, 69, 0.7)',
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
             },
-            scales: {
-                x: { // X-axis is now the Year
-                    type: 'category',
-                    title: {
-                        display: true,
-                        text: 'Year'
-                    }
-                },
-                y: { // Y-axis is now the Amount
-                    type: 'linear',
-                    title: {
-                        display: true,
-                        text: 'Amount Payable (₹)'
-                    }
-                }
-            }
-        }
-    });
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    // 2. Tax Comparison Chart (Line)
+    const taxCtx = document.getElementById('taxComparisonChart');
+    if (taxCtx && typeof chartLabels !== 'undefined' && chartLabels.length > 0) {
+        new Chart(taxCtx, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'GST Payable (₹)',
+                    data: gstData,
+                    borderColor: 'rgba(255, 193, 7, 1)',
+                    backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }, {
+                    label: 'Income Tax Payable (₹)',
+                    data: taxData,
+                    borderColor: 'rgba(220, 53, 69, 1)',
+                    backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    }
 });
+
