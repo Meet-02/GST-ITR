@@ -332,11 +332,17 @@ def dashboard_business():
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.row_factory = sqlite3.Row
-        history = cursor.execute('SELECT * FROM tax_results_business WHERE pan_id = ? ORDER BY created_at DESC', (pan_id,)).fetchall()
+        history = cursor.execute(
+            '''SELECT id, gross_income, net_taxable_income, gst_payable, final_tax_payable, insights, created_at 
+               FROM tax_results_business 
+               WHERE pan_id = ? 
+               ORDER BY created_at ASC''',
+            (pan_id,)
+        ).fetchall()
 
     history_for_template = [dict(row) for row in history]
 
-    # Aggregate data by year
+    # --- Aggregated yearly data (kept from your code) ---
     from collections import defaultdict
     yearly_data = defaultdict(lambda: {'gross_income': [], 'gst_payable': [], 'final_tax_payable': []})
     for row in history_for_template:
@@ -345,22 +351,34 @@ def dashboard_business():
         yearly_data[year]['gst_payable'].append(row['gst_payable'])
         yearly_data[year]['final_tax_payable'].append(row['final_tax_payable'])
 
-    # Prepare chart data (chronological order by year)
     sorted_years = sorted(yearly_data.keys())
-    labels = sorted_years
-    revenue_data = [sum(yearly_data[year]['gross_income']) for year in sorted_years]  # Sum for annual
-    gst_data = [sum(yearly_data[year]['gst_payable']) for year in sorted_years]  # Sum
-    tax_data = [sum(yearly_data[year]['final_tax_payable']) for year in sorted_years]  # Sum
+    yearly_labels = sorted_years
+    revenue_data_yearly = [sum(yearly_data[year]['gross_income']) for year in sorted_years]
+    gst_data_yearly = [sum(yearly_data[year]['gst_payable']) for year in sorted_years]
+    tax_data_yearly = [sum(yearly_data[year]['final_tax_payable']) for year in sorted_years]
+
+    # --- Point-by-point data (like job dashboard) ---
+    labels = [f"Calc {i+1} ({row['created_at'].split(' ')[0]})" for i, row in enumerate(history_for_template)]
+    revenue_data = [float(row['gross_income'] or 0) for row in history_for_template]
+    gst_data = [float(row['gst_payable'] or 0) for row in history_for_template]
+    tax_data = [float(row['final_tax_payable'] or 0) for row in history_for_template]
 
     return render_template(
         'dash_bus.html',
         history=history_for_template,
         pan_number=pan_id,
+        # detailed (each calculation)
         labels=labels,
         revenue_data=revenue_data,
         gst_data=gst_data,
-        tax_data=tax_data
+        tax_data=tax_data,
+        # aggregated yearly (optional use in template if needed)
+        yearly_labels=yearly_labels,
+        revenue_data_yearly=revenue_data_yearly,
+        gst_data_yearly=gst_data_yearly,
+        tax_data_yearly=tax_data_yearly
     )
+
 
 @app.route('/dashboard/job')
 def dashboard_job():

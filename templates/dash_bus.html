@@ -58,114 +58,100 @@
     </aside>
 
     <main class="main-content">
-        <div class="user-info">
-            <h2><i class="fa-solid fa-building"></i> Business Dashboard - PAN: {{ pan_number }}</h2>
-            <p>Your Business Tax History & Analytics</p>
-        </div>
         <section id="dashboard-content" class="page-content">
             <h1>Financial Overview</h1>
             <p>Welcome! Here is a summary of your recent financial data.</p>
             <div class="charts-container">
                 {% if labels %}
                 <div class="chart-wrapper">
-                    <h2>Monthly GST Payable</h2>
-                    <canvas id="monthlyGstChart" style="width: 100%; height: 300px;"></canvas>
+                    <h2>Annual Revenue</h2>
+                    <canvas id="annualRevenueChart"></canvas>
                 </div>
                 <div class="chart-wrapper">
-                    <h2>Annual Revenue</h2>
-                    <canvas id="annualRevenueChart" style="width: 100%; height: 300px;"></canvas>
+                    <h2>Monthly GST Payable</h2>
+                    <canvas id="monthlyGstChart"></canvas>
                 </div>
                 <div class="chart-wrapper">
                     <h2>Tax Payable</h2>
-                    <canvas id="taxPayableChart" style="width: 100%; height: 300px;"></canvas>
+                    <canvas id="taxPayableChart"></canvas>
                 </div>
+
 
                 <script>
                     document.addEventListener("DOMContentLoaded", function () {
-                        console.log("Chart JS loading");
-                        // Data from backend - ALL calculations
-                        const calculationLabels = {{ labels | tojson }};
-                        const revenueData = {{ revenue_data | tojson }};
-                        const gstData = {{ gst_data | tojson }};
-                        const taxData = {{ tax_data | tojson }};
-                        console.log("Labels:", calculationLabels);
-                        console.log("Revenue:", revenueData);
-                        console.log("GST:", gstData);
-                        console.log("Tax:", taxData);
-            
-                        // All Calculations - GST Payable (Line Chart)
-                        try {
-                            const gstCtx = document.getElementById('monthlyGstChart').getContext('2d');
-                            const gstChart = new Chart(gstCtx, {
-                                type: 'line',
-                                data: {
-                                    labels: calculationLabels,
-                                    datasets: [{
-                                        label: 'GST Payable',
-                                        data: gstData,
-                                        borderColor: 'rgba(255, 193, 7, 1)',
-                                        backgroundColor: 'rgba(255, 193, 7, 0.2)',
-                                        tension: 0.1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true
-                                }
-                            });
-                            console.log("GST Chart created successfully");
-                        } catch (error) {
-                            console.error("Error creating GST chart:", error);
-                        }
-            
-                        // All Calculations - Revenue (Bar Chart)
-                        try {
-                            const revenueCtx = document.getElementById('annualRevenueChart').getContext('2d');
-                            const revenueChart = new Chart(revenueCtx, {
-                                type: 'bar',
-                                data: {
-                                    labels: calculationLabels,
-                                    datasets: [{
-                                        label: 'Revenue',
-                                        data: revenueData,
-                                        backgroundColor: 'rgba(40, 167, 69, 0.6)',
-                                        borderColor: 'rgba(40, 167, 69, 1)',
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true
-                                }
-                            });
-                            console.log("Revenue Chart created successfully");
-                        } catch (error) {
-                            console.error("Error creating Revenue chart:", error);
-                        }
-            
-                        // All Calculations - Tax Payable (Bar Chart)
-                        try {
-                            const taxCtx = document.getElementById('taxPayableChart').getContext('2d');
-                            const taxChart = new Chart(taxCtx, {
-                                type: 'bar',
-                                data: {
-                                    labels: calculationLabels,
-                                    datasets: [{
-                                        label: 'Tax Payable',
-                                        data: taxData,
-                                        backgroundColor: 'rgba(220, 53, 69, 0.6)',
-                                        borderColor: 'rgba(220, 53, 69, 1)',
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true
-                                }
-                            });
-                            console.log("Tax Chart created successfully");
-                        } catch (error) {
-                            console.error("Error creating Tax chart:", error);
-                        }
+                        const calculationLabels = {{ labels | tojson
+                    }};
+                    const revenueData = {{ revenue_data | tojson }};
+                    const gstData = {{ gst_data | tojson }};
+                    const taxData = {{ tax_data | tojson }};
+
+                    console.log("Labels:", calculationLabels);
+                    console.log("Revenue:", revenueData);
+                    console.log("GST:", gstData);
+                    console.log("Tax:", taxData);
+
+                    // --- Revenue Line Chart ---
+                    try {
+                        const revenueCtx = document.getElementById('annualRevenueChart').getContext('2d');
+                        new Chart(revenueCtx, {
+                            type: 'line',
+                            data: {
+                                labels: calculationLabels,
+                                datasets: [{
+                                    label: 'Gross Revenue (₹)',
+                                    data: revenueData,
+                                    borderColor: 'rgba(40, 167, 69, 1)',
+                                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                                    fill: true,
+                                    tension: 0.1
+                                }]
+                            },
+                            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                        });
+                    } catch (error) { console.error("Error creating Revenue chart:", error); }
+
+                    // --- GST Line Chart ---
+                    try {
+                        const gstCtx = document.getElementById('monthlyGstChart').getContext('2d');
+                        new Chart(gstCtx, {
+                            type: 'line',
+                            data: {
+                                labels: calculationLabels,
+                                datasets: [{
+                                    label: 'GST Payable (₹)',
+                                    data: gstData,
+                                    borderColor: 'rgba(255, 193, 7, 1)',
+                                    backgroundColor: 'rgba(255, 193, 7, 0.2)',
+                                    fill: true,
+                                    tension: 0.1
+                                }]
+                            },
+                            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                        });
+                    } catch (error) { console.error("Error creating GST chart:", error); }
+
+                    // --- Tax Bar Chart ---
+                    try {
+                        const taxCtx = document.getElementById('taxPayableChart').getContext('2d');
+                        new Chart(taxCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: calculationLabels,
+                                datasets: [{
+                                    label: 'Income Tax Payable (₹)',
+                                    data: taxData,
+                                    backgroundColor: 'rgba(220, 53, 69, 0.6)',
+                                    borderColor: 'rgba(220, 53, 69, 1)',
+                                    borderWidth: 1,
+                                    borderRadius: 5
+                                }]
+                            },
+                            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                        });
+                    } catch (error) { console.error("Error creating Tax chart:", error); }
                     });
                 </script>
+
                 {% else %}
                 <p>No business calculations found. Complete your first business tax calculation to see graphs here.</p>
                 {% endif %}
@@ -177,7 +163,8 @@
 
             <!-- History Table Section -->
             <div class="history-section">
-                <h3><i class="fa-solid fa-clock-rotate-left"></i> Business Calculation History (Total: {{ history|length if history else 0 }})</h3>
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Business Calculation History (Total: {{ history|length
+                    if history else 0 }})</h3>
 
                 {% if history %}
                 <div class="table-container">
@@ -203,10 +190,12 @@
                                 <td>{{ "%.2f"|format(calc.gst_payable) }}</td>
                                 <td>{{ "%.2f"|format(calc.final_tax_payable) }}</td>
                                 <td>
-                                    {% if calc.insights and calc.insights != "Could not generate AI insights at this time." %}
-                                        <div class="insights-cell">{{ calc.insights[:100] }}{% if calc.insights|length > 100 %}...{% endif %}</div>
+                                    {% if calc.insights and calc.insights != "Could not generate AI insights at this
+                                    time." %}
+                                    <div class="insights-cell">{{ calc.insights[:100] }}{% if calc.insights|length > 100
+                                        %}...{% endif %}</div>
                                     {% else %}
-                                        -
+                                    -
                                     {% endif %}
                                 </td>
                             </tr>
@@ -216,7 +205,8 @@
                 </div>
                 {% else %}
                 <div class="no-history">
-                    <p>No business tax calculations found. Complete your first business tax calculation to see history here.</p>
+                    <p>No business tax calculations found. Complete your first business tax calculation to see history
+                        here.</p>
                 </div>
                 {% endif %}
             </div>
