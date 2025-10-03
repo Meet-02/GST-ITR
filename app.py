@@ -1,3 +1,5 @@
+
+
 import os
 import sqlite3
 import re
@@ -333,8 +335,7 @@ def dashboard_business():
         history = cursor.execute('SELECT * FROM tax_results_business WHERE pan_id = ? ORDER BY created_at DESC', (pan_id,)).fetchall()
         
     history_for_template = [dict(row) for row in history]
-    total_calculations = len(history_for_template)
-
+    
     # Prepare chart data (chronological order)
     labels = [row['created_at'].split(' ')[0] for row in reversed(history_for_template)]
     revenue_data = [row['gross_income'] for row in reversed(history_for_template)]
@@ -342,13 +343,12 @@ def dashboard_business():
     tax_data = [row['final_tax_payable'] for row in reversed(history_for_template)]
 
     return render_template(
-        'dash_bus.html',
-        history=history_for_template,
+        'dash_bus.html', 
+        history=history_for_template, 
         pan_number=pan_id,
-        total_calculations=total_calculations,
-        labels=labels,
-        revenue_data=revenue_data,
-        gst_data=gst_data,
+        labels=labels, 
+        revenue_data=revenue_data, 
+        gst_data=gst_data, 
         tax_data=tax_data
     )
 
@@ -364,8 +364,7 @@ def dashboard_job():
         history = cursor.execute('SELECT * FROM tax_results_job WHERE pan_id = ? ORDER BY created_at DESC', (pan_id,)).fetchall()
         
     history_for_template = [dict(row) for row in history]
-    total_calculations = len(history_for_template)
-
+    
     # Prepare chart data (chronological order)
     labels = [row['financial_year'] for row in reversed(history_for_template)]
     gross_income_data = [row['gross_income'] for row in reversed(history_for_template)]
@@ -373,13 +372,12 @@ def dashboard_job():
     net_income_data = [row['net_income'] for row in reversed(history_for_template)]
 
     return render_template(
-        'dash_job.html',
-        history=history_for_template,
+        'dash_job.html', 
+        history=history_for_template, 
         pan_number=pan_id,
-        total_calculations=total_calculations,
-        labels=labels,
-        gross_income_data=gross_income_data,
-        tax_data=tax_data,
+        labels=labels, 
+        gross_income_data=gross_income_data, 
+        tax_data=tax_data, 
         net_income_data=net_income_data
     )
 
@@ -391,7 +389,7 @@ def download_business_report():
     required_keys = ['person_id', 'business_income', 'business_details', 'business_expenses', 'finance_deduction']
     if not all(key in session for key in required_keys):
         flash("Session expired. Please fill out business forms again to download.")
-        return redirect(url_for('details'))
+        return redirect(url_for('user_details'))
 
     person_id = session.get('person_id')
     personal_details = {}
@@ -429,7 +427,7 @@ def download_job_report():
     required_keys = ['person_id', 'job_income', 'job_deductions']
     if not all(key in session for key in required_keys):
         flash("Session expired. Please fill out job forms again to download.")
-        return redirect(url_for('details'))
+        return redirect(url_for('user_details'))
     
     person_id = session.get('person_id')
     personal_details = {}
@@ -460,7 +458,6 @@ def download_job_report():
 
     pdf_buffer = create_job_report(data_for_pdf)
     return send_file(pdf_buffer, as_attachment=True, download_name='Job_Tax_Report.pdf', mimetype='application/pdf')
-
 
 if __name__ == '__main__':
     app.run(debug=True)
