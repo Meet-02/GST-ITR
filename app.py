@@ -144,6 +144,9 @@ def details():
                 cursor.execute("INSERT OR IGNORE INTO user_pan_mapping (pan_id, person_id) VALUES (?, ?)", (pan_id, person_id))
 
             if category == "business":
+                # --- FIX: Delete JOB record to ensure user lands on business dashboard next time ---
+                cursor.execute("DELETE FROM job_person WHERE person_id = ?", (person_id,))
+                # ---------------------------------------------------------------------------------
                 business_name = request.form.get('Bussname')
                 cursor.execute("INSERT OR IGNORE INTO businesses (person_id, business_name) VALUES (?, ?)", (person_id, business_name))
                 business = cursor.execute("SELECT id FROM businesses WHERE person_id = ?", (person_id,)).fetchone()
@@ -153,6 +156,9 @@ def details():
                 return redirect(url_for("business_details"))
 
             elif category == "job":
+                # --- FIX: Delete BUSINESS record to ensure user lands on job dashboard next time ---
+                cursor.execute("DELETE FROM businesses WHERE person_id = ?", (person_id,))
+                # ------------------------------------------------------------------------------------
                 cursor.execute("INSERT OR IGNORE INTO job_person (person_id, employer_category, employer_tan_number) VALUES (?, ?, ?)",
                                (person_id, request.form.get('empc'), request.form.get('tan')))
                 job_person = cursor.execute("SELECT id FROM job_person WHERE person_id = ?", (person_id,)).fetchone()
@@ -223,12 +229,14 @@ def business_result():
     insights = ""
     if GEMINI_API_KEY:
         try:
+            # FIX: Corrected f-string formatting from template style to Python style
             prompt = f"Analyze this business data and provide 2-3 simple tax tips: Revenue ₹{gross_revenue:,.2f}, Expenses ₹{total_expenses:,.2f}, 80C Investment ₹{fin_deductions.get('section_80c', 0):,.2f}"
             model = genai.GenerativeModel('gemini-pro')
             response = model.generate_content(prompt)
             insights = response.text
         except Exception as e:
             print(f"Error calling Gemini API: {e}")
+            # It already is the default failure message, but setting it again for clarity.
             insights = "Could not generate AI insights at this time."
 
     with sqlite3.connect(db_path) as conn:
@@ -293,12 +301,14 @@ def job_result():
             section_80c_total = sum(job_deductions.get(k, 0) for k in ['epf_ppf', 'life_ins', 'elss', 'home_loan_principal', 'tuition', 'other_80c'])
             health_insurance_80d = job_deductions.get('health_ins_self', 0) + job_deductions.get('health_ins_parents', 0)
             
+            # FIX: Corrected f-string formatting from template style to Python style
             prompt = f"Analyze this salaried employee's data and give 2-3 tax tips: Gross Salary ₹{gross_income:,.2f}, 80C Investments ₹{section_80c_total:,.2f}, 80D Health Insurance ₹{health_insurance_80d:,.2f}"
             model = genai.GenerativeModel('gemini-pro')
             response = model.generate_content(prompt)
             insights = response.text
         except Exception as e:
             print(f"Error calling Gemini API: {e}")
+            # It already is the default failure message, but setting it again for clarity.
             insights = "Could not generate AI insights at this time."
 
     with sqlite3.connect(db_path) as conn:
