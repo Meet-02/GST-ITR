@@ -382,12 +382,13 @@ def dashboard_job():
     net_income_data = [row['net_income'] for row in reversed(history_for_template)]
 
     return render_template(
-        'dash_job.html', 
-        history=history_for_template, 
+        'dash_job.html',
+        history=history_for_template,
         pan_number=pan_id,
-        labels=labels, 
-        gross_income_data=gross_income_data, 
-        tax_data=tax_data, 
+        total_calculations=len(history_for_template),
+        labels=labels,
+        gross_income_data=gross_income_data,
+        tax_data=tax_data,
         net_income_data=net_income_data
     )
 

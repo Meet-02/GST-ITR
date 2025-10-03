@@ -124,13 +124,23 @@ body {
 
 .chart-wrapper {
     flex: 1;
-    min-width: 300px; /* Minimum width for each chart */
+    min-width: 300px;
     max-width: 500px;
+    height: 320px;   /* ✅ FIX: lock height */
     padding: 20px;
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* keeps canvas centered */
 }
+
+.chart-wrapper canvas {
+    width: 100% !important;  /* Chart.js will fit inside */
+    height: 100% !important; /* No infinite stretch */
+}
+
 
 @media (max-width: 768px) {
     .sidebar {

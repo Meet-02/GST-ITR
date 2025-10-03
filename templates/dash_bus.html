@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
 </head>
 
 <body>
@@ -69,15 +69,15 @@
                 {% if labels %}
                 <div class="chart-wrapper">
                     <h2>Monthly GST Payable</h2>
-                    <canvas id="monthlyGstChart"></canvas>
+                    <canvas id="monthlyGstChart" style="width: 100%; height: 300px;"></canvas>
                 </div>
                 <div class="chart-wrapper">
                     <h2>Annual Revenue</h2>
-                    <canvas id="annualRevenueChart"></canvas>
+                    <canvas id="annualRevenueChart" style="width: 100%; height: 300px;"></canvas>
                 </div>
                 <div class="chart-wrapper">
                     <h2>Tax Payable</h2>
-                    <canvas id="taxPayableChart"></canvas>
+                    <canvas id="taxPayableChart" style="width: 100%; height: 300px;"></canvas>
                 </div>
 
                 <script>
