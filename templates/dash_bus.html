@@ -174,37 +174,45 @@
 
         <section id="history-content" class="page-content" style="display: none;">
             <h1>Filing History</h1>
-            
-            <!-- Enhanced Business History Section -->
+
+            <!-- History Table Section -->
             <div class="history-section">
-                <h3><i class="fa-solid fa-clock-rotate-left"></i> Business Calculation History (Total: {{ total_calculations }})</h3>
-                
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Business Calculation History (Total: {{ history|length if history else 0 }})</h3>
+
                 {% if history %}
-                <div class="history-list">
-                    {% for calc in history %}
-                    <div class="history-item">
-                        <div class="history-header">
-                            <strong>Calculation #{{ loop.index }}</strong>
-                            <span class="history-date">{{ calc.created_at }}</span>
-                        </div>
-                        <div class="history-details">
-                            <div class="history-row">
-                                <span>Gross Income: ₹{{ "%.2f"|format(calc.gross_income) }}</span>
-                                <span>Net Taxable: ₹{{ "%.2f"|format(calc.net_taxable_income) }}</span>
-                            </div>
-                            <div class="history-row">
-                                <span>GST Payable: ₹{{ "%.2f"|format(calc.gst_payable) }}</span>
-                                <span>Final Tax: ₹{{ "%.2f"|format(calc.final_tax_payable) }}</span>
-                            </div>
-                            {% if calc.insights and calc.insights != "Could not generate AI insights at this time." %}
-                            <div class="history-insights">
-                                <strong>AI Insights:</strong>
-                                <p>{{ calc.insights }}</p>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
+                <div class="table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Gross Income (₹)</th>
+                                <th>Net Taxable Income (₹)</th>
+                                <th>GST Payable (₹)</th>
+                                <th>Final Tax Payable (₹)</th>
+                                <th>AI Insights</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for calc in history %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ calc.created_at.split(' ')[0] }}</td>
+                                <td>{{ "%.2f"|format(calc.gross_income) }}</td>
+                                <td>{{ "%.2f"|format(calc.net_taxable_income) }}</td>
+                                <td>{{ "%.2f"|format(calc.gst_payable) }}</td>
+                                <td>{{ "%.2f"|format(calc.final_tax_payable) }}</td>
+                                <td>
+                                    {% if calc.insights and calc.insights != "Could not generate AI insights at this time." %}
+                                        <div class="insights-cell">{{ calc.insights[:100] }}{% if calc.insights|length > 100 %}...{% endif %}</div>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
                 {% else %}
                 <div class="no-history">
@@ -212,7 +220,7 @@
                 </div>
                 {% endif %}
             </div>
-            <!-- End Enhanced Business History Section -->
+            <!-- End History Table Section -->
 
         </section>
 

@@ -166,34 +166,44 @@
         <section id="history-content" class="page-content" style="display: none;">
             <h1>Filing History</h1>
 
-            <!-- Enhanced History Section -->
+            <!-- History Table Section -->
             <div class="history-section">
-                <h3><i class="fa-solid fa-clock-rotate-left"></i> Calculation History (Total: {{ total_calculations }})
-                </h3>
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Calculation History (Total: {{ history|length if history else 0 }})</h3>
 
                 {% if history %}
-                <div class="history-list">
-                    {% for calc in history %}
-                    <div class="history-item">
-                        <div class="history-header">
-                            <strong>Calculation #{{ loop.index }} - {{ calc.financial_year }}</strong>
-                            <span class="history-date">{{ calc.created_at }}</span>
-                        </div>
-                        <div class="history-details">
-                            <div class="history-row">
-                                <span>Gross Income: ₹{{ "%.2f"|format(calc.gross_income) }}</span>
-                                <span>Tax: ₹{{ "%.2f"|format(calc.tax) }}</span>
-                                <span>Net Income: ₹{{ "%.2f"|format(calc.net_income) }}</span>
-                            </div>
-                            {% if calc.insights and calc.insights != "Could not generate AI insights at this time." %}
-                            <div class="history-insights">
-                                <strong>AI Insights:</strong>
-                                <p>{{ calc.insights }}</p>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
+                <div class="table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Financial Year</th>
+                                <th>Date</th>
+                                <th>Gross Income (₹)</th>
+                                <th>Tax Paid (₹)</th>
+                                <th>Net Income (₹)</th>
+                                <th>AI Insights</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for calc in history %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ calc.financial_year }}</td>
+                                <td>{{ calc.created_at.split(' ')[0] }}</td>
+                                <td>{{ "%.2f"|format(calc.gross_income) }}</td>
+                                <td>{{ "%.2f"|format(calc.tax) }}</td>
+                                <td>{{ "%.2f"|format(calc.net_income) }}</td>
+                                <td>
+                                    {% if calc.insights and calc.insights != "Could not generate AI insights at this time." %}
+                                        <div class="insights-cell">{{ calc.insights[:100] }}{% if calc.insights|length > 100 %}...{% endif %}</div>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
                 {% else %}
                 <div class="no-history">
@@ -201,7 +211,7 @@
                 </div>
                 {% endif %}
             </div>
-            <!-- End Enhanced History Section -->
+            <!-- End History Table Section -->
 
         </section>
 
@@ -210,12 +220,6 @@
             <p>The form for filing a new ITR or GST return will be placed here.</p>
         </section>
     </main>
-    <script>
-        const gross_income = {{ gross_income| tojson }};
-        const deductions = {{ deductions| tojson }};
-        const net_income = {{ net_income| tojson }};
-        const tax = {{ tax| tojson }};
-    </script>
     <script src="{{ url_for('static', filename='dash_job.js') }}"></script>
 </body>
 

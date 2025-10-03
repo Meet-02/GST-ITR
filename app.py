@@ -1,5 +1,3 @@
-
-
 import os
 import sqlite3
 import re
@@ -31,7 +29,8 @@ else:
 
 # --- Database Configuration ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-db_path = os.path.join(BASE_DIR, 'database/mydata.db')
+db_dir = os.path.join(BASE_DIR, 'database')
+db_path = os.path.join(db_dir, 'mydata.db')
 
 # --- Helper Function ---
 def get_float(key):
@@ -113,6 +112,7 @@ def dashboard():
             return redirect(url_for('dashboard_job'))
 
     return render_template('category.html')
+
 
 @app.route('/select_category', methods=['POST'])
 def select_category():
@@ -327,28 +327,38 @@ def job_result():
 def dashboard_business():
     if 'pan_id' not in session:
         return redirect(url_for('signup'))
-    
+
     pan_id = session.get('pan_id')
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.row_factory = sqlite3.Row
         history = cursor.execute('SELECT * FROM tax_results_business WHERE pan_id = ? ORDER BY created_at DESC', (pan_id,)).fetchall()
-        
+
     history_for_template = [dict(row) for row in history]
-    
-    # Prepare chart data (chronological order)
-    labels = [row['created_at'].split(' ')[0] for row in reversed(history_for_template)]
-    revenue_data = [row['gross_income'] for row in reversed(history_for_template)]
-    gst_data = [row['gst_payable'] for row in reversed(history_for_template)]
-    tax_data = [row['final_tax_payable'] for row in reversed(history_for_template)]
+
+    # Aggregate data by year
+    from collections import defaultdict
+    yearly_data = defaultdict(lambda: {'gross_income': [], 'gst_payable': [], 'final_tax_payable': []})
+    for row in history_for_template:
+        year = row['created_at'][:4]  # Extract year
+        yearly_data[year]['gross_income'].append(row['gross_income'])
+        yearly_data[year]['gst_payable'].append(row['gst_payable'])
+        yearly_data[year]['final_tax_payable'].append(row['final_tax_payable'])
+
+    # Prepare chart data (chronological order by year)
+    sorted_years = sorted(yearly_data.keys())
+    labels = sorted_years
+    revenue_data = [sum(yearly_data[year]['gross_income']) for year in sorted_years]  # Sum for annual
+    gst_data = [sum(yearly_data[year]['gst_payable']) for year in sorted_years]  # Sum
+    tax_data = [sum(yearly_data[year]['final_tax_payable']) for year in sorted_years]  # Sum
 
     return render_template(
-        'dash_bus.html', 
-        history=history_for_template, 
+        'dash_bus.html',
+        history=history_for_template,
         pan_number=pan_id,
-        labels=labels, 
-        revenue_data=revenue_data, 
-        gst_data=gst_data, 
+        labels=labels,
+        revenue_data=revenue_data,
+        gst_data=gst_data,
         tax_data=tax_data
     )
 
@@ -389,75 +399,119 @@ def download_business_report():
     required_keys = ['person_id', 'business_income', 'business_details', 'business_expenses', 'finance_deduction']
     if not all(key in session for key in required_keys):
         flash("Session expired. Please fill out business forms again to download.")
-        return redirect(url_for('user_details'))
+        return redirect(url_for('business_details'))
 
-    person_id = session.get('person_id')
-    personal_details = {}
-    with sqlite3.connect(db_path) as conn:
-        cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
-        user_data = cursor.execute("SELECT name, email, mobile_number FROM people_info WHERE id = ?", (person_id,)).fetchone()
-        if user_data:
-            personal_details = dict(user_data)
-
+    # Gather data from session
     bus_income = session.get('business_income', {})
     bus_details = session.get('business_details', {})
     bus_expenses = session.get('business_expenses', {})
     fin_deductions = session.get('finance_deduction', {})
 
-    total_revenue = bus_income.get('total_income', 0)
-    total_expenses = sum(bus_expenses.values())
-    
-    final_tax_due, taxable_income = calc_bus_tax_new_regime(total_revenue, total_expenses)
+    # Get personal info
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        person = cursor.execute("SELECT * FROM people_info WHERE id = ?", (session.get('person_id'),)).fetchone()
+        personal = {
+            'name': person[1] if person else 'N/A',
+            'email': person[4] if person else 'N/A',
+            'mobile_number': person[6] if person else 'N/A',
+            'age': 'N/A'  # Not stored, placeholder
+        }
 
-    data_for_pdf = {
-        'personal': personal_details,
-        'income': {**bus_income, **bus_details},
-        'gst': bus_details,
-        'expenses': {**bus_expenses, **fin_deductions},
-        'summary': {'taxable_income': taxable_income, 'final_tax_due': final_tax_due}
+    # Prepare data for PDF
+    data = {
+        'personal': personal,
+        'income': {
+            'gross_income': bus_income.get('total_income', 0),
+            'other_income': bus_income.get('other_income', 0),
+            'total_revenue': bus_income.get('total_income', 0),
+            'business_name': bus_details.get('business_name', ''),
+            'product_name': bus_details.get('product_name', ''),
+        },
+        'gst': {
+            'purchase_value': bus_details.get('purchase_value', 0),
+            'purchase_rate': bus_details.get('gst_rate_purchase', 0),
+            'purchase_supply_type': bus_details.get('type_of_supply_purchase', ''),
+            'sell_value': bus_details.get('sell_value', 0),
+            'sell_rate': bus_details.get('gst_rate_sell', 0),
+            'sell_supply_type': bus_details.get('type_of_supply_sell', ''),
+        },
+        'expenses': {
+            'rent': bus_expenses.get('rent', 0),
+            'wages': bus_expenses.get('employee_wage', 0),
+            'operating_expenses': bus_expenses.get('operating_expenses', 0),
+            'subscription': bus_expenses.get('subscription', 0),
+            'other': bus_expenses.get('other_expenses', 0),
+            '80c': fin_deductions.get('section_80c', 0),
+            '80d': fin_deductions.get('section_80d', 0),
+            'other_deductions': fin_deductions.get('other_deduction', 0),
+        },
+        'summary': {
+            'taxable_income': session.get('net_taxable_income', 0),  # From result
+            'final_tax_due': session.get('final_tax_payable', 0),
+        }
     }
-    
-    pdf_buffer = create_business_report(data_for_pdf)
 
-    return send_file(pdf_buffer, as_attachment=True, download_name='Business_Tax_Report.pdf', mimetype='application/pdf')
+    # Generate PDF
+    buffer = create_business_report(data)
+
+    # Return PDF
+    return send_file(buffer, as_attachment=True, download_name='business_tax_report.pdf', mimetype='application/pdf')
+
 
 @app.route('/download-job-report')
 def download_job_report():
     required_keys = ['person_id', 'job_income', 'job_deductions']
     if not all(key in session for key in required_keys):
         flash("Session expired. Please fill out job forms again to download.")
-        return redirect(url_for('user_details'))
-    
-    person_id = session.get('person_id')
-    personal_details = {}
-    with sqlite3.connect(db_path) as conn:
-        cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
-        user_data = cursor.execute("SELECT name, email, mobile_number FROM people_info WHERE id = ?", (person_id,)).fetchone()
-        if user_data:
-            personal_details = dict(user_data)
+        return redirect(url_for('job_details'))
 
+    # Gather data from session
     job_income = session.get('job_income', {})
     job_deductions = session.get('job_deductions', {})
 
+    # Get personal info
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        person = cursor.execute("SELECT * FROM people_info WHERE id = ?", (session.get('person_id'),)).fetchone()
+        personal = {
+            'name': person[1] if person else 'N/A',
+            'email': person[4] if person else 'N/A',
+            'mobile_number': person[6] if person else 'N/A',
+        }
+
+    # Calculate totals
     gross_income = sum(v for k, v in job_income.items() if k != 'financial_year')
     tds = job_deductions.get('tds', 0)
     final_tax_due, taxable_income = calc_job_tax_new_regime(gross_income, tds)
-    
-    data_for_pdf = {
-        'personal': personal_details,
-        'income': job_income,
-        'deductions': job_deductions,
+
+    # Prepare data for PDF
+    data = {
+        'personal': personal,
+        'financial_year': job_income.get('financial_year', 'N/A'),
+        'income': {
+            'basic_salary': job_income.get('basic_salary', 0),
+            'hra_received': job_income.get('hra_received', 0),
+            'savings_interest': job_income.get('savings_interest', 0),
+            'fd_interest': job_income.get('fd_interest', 0),
+            'other_income': job_income.get('other_income', 0),
+        },
         'summary': {
             'gross_income': gross_income,
+            'standard_deduction': 50000,  # Assuming standard deduction
             'taxable_income': taxable_income,
-            'final_tax_due': final_tax_due
+            'total_tax': final_tax_due,
+            'tds': tds,
+            'final_tax_due': final_tax_due,
         }
     }
 
-    pdf_buffer = create_job_report(data_for_pdf)
-    return send_file(pdf_buffer, as_attachment=True, download_name='Job_Tax_Report.pdf', mimetype='application/pdf')
+    # Generate PDF
+    buffer = create_job_report(data)
+
+    # Return PDF
+    return send_file(buffer, as_attachment=True, download_name='job_tax_report.pdf', mimetype='application/pdf')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

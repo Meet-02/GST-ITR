@@ -45,6 +45,43 @@ try:
 except sqlite3.OperationalError:
     print("Column 'created_at' already exists in tax_results_business")
 
+# Add missing columns to job_person
+try:
+    cursor.execute("ALTER TABLE job_person ADD COLUMN employer_category TEXT;")
+except sqlite3.OperationalError:
+    print("Column 'employer_category' already exists in job_person")
+
+try:
+    cursor.execute("ALTER TABLE job_person ADD COLUMN employer_tan_number TEXT;")
+except sqlite3.OperationalError:
+    print("Column 'employer_tan_number' already exists in job_person")
+
 conn.commit()
 conn.close()
-print("Schema upgrade complete ✅")
+print("Schema upgrade complete")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import sqlite3
+import os
+
+# Get project root (parent of this file’s folder) - RESTORED TO YOUR ORIGINAL METHOD
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Database folder (only one level)
+db_dir = os.path.join(BASE_DIR, 'database')
+os.makedirs(db_dir, exist_ok=True)
+
+# Database file
+db_path = os.path.join(db_dir, 'mydata.db')
