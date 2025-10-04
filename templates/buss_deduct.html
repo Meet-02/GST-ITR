@@ -17,6 +17,7 @@
             width: 100%;
             max-width: 550px;
             margin: 0 auto 25px auto;
+            top: 25px;
         }
 
         .stepper::before {
@@ -37,7 +38,7 @@
             left: 0;
             height: 4px;
             background-color: #28a745;
-            width: 100%;
+            width: 0;
             transform: translateY(-50%);
             z-index: 1;
         }
@@ -84,12 +85,10 @@
         <p>Fill in your details to get started with a smooth and hassle-free process.</p>
     </div>
     <div class="stepper">
+        <div class="stepper-progress"></div>
         <div class="step completed" data-step="1">1</div>
-        <div class="line"></div>
         <div class="step completed" data-step="2">2</div>
-        <div class="line"></div>
         <div class="step active" data-step="3">3</div>
-        <div class="line"></div>
         <div class="step" data-step="4">4</div>
     </div>
 
@@ -139,13 +138,13 @@
                 <input type="number" class="input-field" id="section80d" name="section-80d">
 
                  <div class="tooltip-container">
-                    <label class="field-label" for="gross-income">
-                        <i class="fa-solid fa-id-badge"></i> Other deductions(Total deduction)
-                        <span class="asterisk">*</span>
-                    </label>
-                    <span class="tooltip-text">The sum of all other deduction(insurances taken)</span>
-                </div>
-                <input type="number" class="input-field" id="gross-income" name="other-ded" required>
+                     <label class="field-label" for="other-ded">
+                         <i class="fa-solid fa-id-badge"></i> Other deductions(Total deduction)
+                         <span class="asterisk">*</span>
+                     </label>
+                     <span class="tooltip-text">The sum of all other deduction(insurances taken)</span>
+                 </div>
+                 <input type="number" class="input-field" id="other-ded" name="other-ded" required>
                 <div class="button">
                     <button type="submit">
                         <span class="shadow"></span>
@@ -160,6 +159,19 @@
     </div>
 
     <script src="{{ url_for('static', filename='pg1.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const activeStep = document.querySelector('.step.active');
+            if (activeStep) {
+                const stepNumber = parseInt(activeStep.getAttribute('data-step'));
+                const progressWidth = ((stepNumber - 1) / 3) * 100;
+                const progressBar = document.querySelector('.stepper-progress');
+                if (progressBar) {
+                    progressBar.style.width = progressWidth + '%';
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

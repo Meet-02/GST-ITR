@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Income Tax Calculator - FinFigo</title>
-    <link rel="stylesheet" href="/static/job.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='job.css') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         /* --- STEPPER STYLES --- */
@@ -17,6 +17,7 @@
             width: 100%;
             max-width: 550px;
             margin: 0 auto 25px auto;
+            top: 25px;
         }
 
         .stepper::before {
@@ -37,7 +38,7 @@
             left: 0;
             height: 4px;
             background-color: #28a745;
-            width: 100%;
+            width: 0;
             transform: translateY(-50%);
             z-index: 1;
         }
@@ -86,12 +87,10 @@
     </div>
 
     <div class="stepper">
+        <div class="stepper-progress"></div>
         <div class="step completed" data-step="1">1</div>
-        <div class="line"></div>
         <div class="step active" data-step="2">2</div>
-        <div class="line"></div>
         <div class="step" data-step="3">3</div>
-        <div class="line"></div>
         <div class="step" data-step="4">4</div>
     </div>
 
@@ -151,5 +150,18 @@
 
 </body>
 <script src="{{ url_for('static', filename='pg1.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const activeStep = document.querySelector('.step.active');
+        if (activeStep) {
+            const stepNumber = parseInt(activeStep.getAttribute('data-step'));
+            const progressWidth = ((stepNumber - 1) / 3) * 100;
+            const progressBar = document.querySelector('.stepper-progress');
+            if (progressBar) {
+                progressBar.style.width = progressWidth + '%';
+            }
+        }
+    });
+</script>
 
 </html>

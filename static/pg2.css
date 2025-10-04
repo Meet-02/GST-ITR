@@ -75,40 +75,7 @@ body {
 }
 
 /* stepper progress */
-.stepper {
-    display: flex;
-    align-items: center;
-    padding-right: 3rem;
-    margin-top: 40px;
-    margin-bottom: 20px;
-    width: 70%;
-    padding-left: 16rem;
-}
 
-.step {
-    width: 35px;
-    height: 35px;
-    border: 2px solid #2a3a8d;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    background: white;
-    color: #2a3a8d;
-    transition: all 0.3s ease;
-}
-
-.step.completed {
-    background: #2a3a8d;
-    color: white;
-}
-
-.line {
-    flex: 1;
-    height: 3px;
-    background: #ccc;
-}
 
 .hidden {
     display: none;
@@ -324,46 +291,7 @@ button:focus:not(:focus-visible) {
 }
 
 /* stepper progress */
-.stepper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px 0;
-}
 
-.step {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #ddd;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    color: #fff;
-    position: relative;
-}
-
-.step.active {
-    background: #007bff;
-    /* Blue for active */
-}
-
-.step.completed {
-    background: #28a745;
-    /* Green for completed */
-}
-
-.line {
-    width: 21rem;
-    height: 3px;
-    background: #ddd;
-}
-
-.step.completed+.line {
-    background: #28a745;
-    /* Green line after completed */
-}
 
 /* Responsive styles for screens smaller than 768px */
 @media (max-width: 768px) {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,9 @@
             align-items: center;
             width: 100%;
             max-width: 550px;
-            margin: 0 auto 25px auto;
+            margin-bottom: 25px;
+            left: 30%;
+            top: 25px;
         }
 
         .stepper::before {
@@ -52,7 +55,6 @@
             align-items: center;
             justify-content: center;
             z-index: 2;
-            transition: all 0.3s ease;
         }
 
         .step.completed {
@@ -64,6 +66,7 @@
             background-color: #0d6efd;
             color: white;
         }
+
         /* --- END STEPPER STYLES --- */
     </style>
 </head>
@@ -71,18 +74,23 @@
 <body>
 
     <header id="header">
-     </header>
-    <div class="banner">
-     </div>
-    <div class="stepper">
-        <div class="step completed" data-step="1">1</div>
-        <div class="line"></div>
-        <div class="step active" data-step="2">2</div>
-        <div class="line"></div>
-        <div class="step" data-step="3">3</div>
-        <div class="line"></div>
-        <div class="step" data-step="4">4</div>
+        <div class="logo-area">
+            <img src="{{ url_for('static', filename='IMAGES/Untitled__2_-removebg-preview.png') }}" alt="Header Photo"
+                class="header-photo">
+            <span>GST & ITR Portal</span>
+        </div>
+    </header>
 
+    <div class="banner">
+        <h1><i class="fa-solid fa-file-invoice-dollar"></i> Easy GST & ITR Filing</h1>
+        <p>Fill in your details to get started with a smooth and hassle-free process.</p>
+    </div>
+    <div class="stepper">
+        <div class="stepper-progress"></div>
+        <div class="step completed" data-step="1">1</div>
+        <div class="step active" data-step="2">2</div>
+        <div class="step" data-step="3">3</div>
+        <div class="step" data-step="4">4</div>
     </div>
 
     <div class="outer-container">
@@ -92,28 +100,33 @@
                 <form action="{{ url_for('business_details') }}" method="POST">
 
                     <h1><i class="fa-solid fa-user"></i> Income Details</h1>
-                    
+
                     <label class="field-label" for="gr-in">Gross income <span class="asterisk">*</span></label>
                     <input type="number" class="input-field" id="gr-in" name="gr-in" required>
-                    
-                    <label class="field-label" for="oth-in">Other income source <span class="lead">(Total Amount)</span> <span class="asterisk">*</span></label>
+
+                    <label class="field-label" for="oth-in">Other income source <span class="lead">(Total Amount)</span>
+                        <span class="asterisk">*</span></label>
                     <input type="number" class="input-field" id="oth-in" name="oth-in" required>
 
-                    <label class="field-label" for="total-revenue"><i class="fa-solid fa-calculator"></i> Total Revenue</label>
-                    <input type="number" class="input-field" id="total-revenue" name="total-rev" readonly style="background-color: #f0f0f0; font-weight: bold;">
+                    <label class="field-label" for="total-revenue"><i class="fa-solid fa-calculator"></i> Total
+                        Revenue</label>
+                    <input type="number" class="input-field" id="total-revenue" name="total-rev" readonly
+                        style="background-color: #f0f0f0; font-weight: bold;">
 
                     <h1><i class="fa-solid fa-user"></i> Business Details</h1>
-                    
+
                     <label class="field-label" for="Bus">Business name <span class="asterisk">*</span></label>
                     <input type="text" class="input-field" id="Bus" name="Bus" required>
-                    
+
                     <label class="field-label" for="pr-name">Product name <span class="asterisk">*</span></label>
                     <input type="text" class="input-field" id="pr-name" name="pr-name" required>
 
-                    <label class="field-label" for="pur-price">Purchase value <span class="lead">(without GST)</span><span class="asterisk">*</span></label>
+                    <label class="field-label" for="pur-price">Purchase value <span class="lead">(without
+                            GST)</span><span class="asterisk">*</span></label>
                     <input type="number" class="input-field" id="pur-price" name="pur-price" required>
-                    
-                    <label class="field-label" for="pur-gst">GST RATE <span class="lead">(according to purchase)</span><span class="asterisk">*</span></label>
+
+                    <label class="field-label" for="pur-gst">GST RATE <span class="lead">(according to
+                            purchase)</span><span class="asterisk">*</span></label>
                     <select class="input-field" id="pur-gst" name="pur-gst" required>
                         <option value="" disabled selected>Select GST Rate</option>
                         <option value="5">5%</option>
@@ -122,18 +135,21 @@
                         <option value="28">28%</option>
                     </select>
 
-                    <label class="field-label" for="tos-p">Type of Supply <span class="lead">(according to purchase)</span> <span class="asterisk">*</span></label>
+                    <label class="field-label" for="tos-p">Type of Supply <span class="lead">(according to
+                            purchase)</span> <span class="asterisk">*</span></label>
                     <select class="input-field" id="tos-p" name="tos-p" required>
                         <option value="" selected disabled>Select</option>
                         <option value="Intra-State">Intra-State</option>
                         <option value="Inter-State">Inter-State</option>
                     </select>
 
-                    <label class="field-label" for="sal-price">SELL value <span class="lead">(without GST)</span><span class="asterisk">*</span></label>
+                    <label class="field-label" for="sal-price">SELL value <span class="lead">(without GST)</span><span
+                            class="asterisk">*</span></label>
                     <input type="number" class="input-field" id="sal-price" name="sal-price" required>
 
-                    <label class="field-label" for="sell-gst">GST RATE <span class="lead">(according to SELL)</span><span class="asterisk">*</span></label>
-                    <select class="input-field" id="sal-gst" name="sell-gst" required>
+                    <label class="field-label" for="sell-gst">GST RATE <span class="lead">(according to
+                            SELL)</span><span class="asterisk">*</span></label>
+                    <select class="input-field" id="sell-gst" name="sell-gst" required>
                         <option value="" disabled selected>Select GST Rate</option>
                         <option value="5">5%</option>
                         <option value="12">12%</option>
@@ -141,7 +157,8 @@
                         <option value="28">28%</option>
                     </select>
 
-                    <label class="field-label" for="tos-s">Type of Supply <span class="lead">(according to selling)</span> <span class="asterisk">*</span></label>
+                    <label class="field-label" for="tos-s">Type of Supply <span class="lead">(according to
+                            selling)</span> <span class="asterisk">*</span></label>
                     <select class="input-field" id="tos-s" name="tos-s" required>
                         <option value="" selected disabled>Select</option>
                         <option value="Intra-State">Intra-State</option>
@@ -152,9 +169,39 @@
                         <button type="submit" class="submit-button">Submit</button>
                     </div>
 
-                </form> </div>
+                </form>
+            </div>
         </div>
     </div>
     <script src="{{ url_for('static', filename='pg1.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Stepper progress
+            const activeStep = document.querySelector('.step.active');
+            if (activeStep) {
+                const stepNumber = parseInt(activeStep.getAttribute('data-step'));
+                const progressWidth = ((stepNumber - 1) / 3) * 100;
+                const progressBar = document.querySelector('.stepper-progress');
+                if (progressBar) {
+                    progressBar.style.width = progressWidth + '%';
+                }
+            }
+
+            // Calculate total revenue
+            const grIn = document.getElementById('gr-in');
+            const othIn = document.getElementById('oth-in');
+            const totalRev = document.getElementById('total-revenue');
+
+            function updateTotal() {
+                const gr = parseFloat(grIn.value) || 0;
+                const oth = parseFloat(othIn.value) || 0;
+                totalRev.value = (gr + oth).toFixed(2);
+            }
+
+            grIn.addEventListener('input', updateTotal);
+            othIn.addEventListener('input', updateTotal);
+        });
+    </script>
 </body>
+
 </html>
