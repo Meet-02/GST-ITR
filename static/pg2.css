@@ -295,17 +295,96 @@ button:focus:not(:focus-visible) {
 
 /* Responsive styles for screens smaller than 768px */
 @media (max-width: 768px) {
-    .step {
-        width: 30px;
-        /* Correctly shrunk size */
-        height: 30px;
-        font-size: 0.8rem;
-        /* smaller font inside */
+    #header {
+        padding: 0.6rem 1.5rem;
     }
 
-    .line {
-        width: 30px;
-        /* shorten the connector line */
+    .banner h1 {
+        font-size: 1.8rem;
+    }
+
+    .banner p {
+        font-size: 0.9rem;
+    }
+
+    .outer-container {
+        padding: 2rem 1rem;
+    }
+
+    .content-container {
+        padding: 1.5rem;
+    }
+
+    .stepper {
+        max-width: 90%;
+    }
+
+    .step {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Responsive styles for screens smaller than 480px */
+@media (max-width: 480px) {
+    #header {
+        padding: 0.5rem 1rem;
+        width: 98%;
+    }
+
+    .logo-area {
+        font-size: 1rem;
+    }
+
+    #header img {
+        height: 30px;
+    }
+
+    .banner {
+        padding: 1.5rem 1rem;
+        margin-top: 70px;
+    }
+
+    .banner h1 {
+        font-size: 1.5rem;
+    }
+
+    .banner p {
+        font-size: 0.8rem;
+    }
+
+    .outer-container {
+        padding: 1rem 0.5rem;
+    }
+
+    .content-container {
+        padding: 1rem;
+    }
+
+    .form-section h1 {
+        font-size: 1.5rem;
+    }
+
+    .stepper {
+        max-width: 95%;
+        margin: 0 auto 20px auto;
+    }
+
+    .step {
+        width: 25px;
+        height: 25px;
+        font-size: 0.7rem;
+    }
+
+    .input-field {
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+
+    .submit-button {
+        padding: 10px 25px;
+        font-size: 1rem;
     }
 }
 .button-container {

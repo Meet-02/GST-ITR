@@ -148,8 +148,7 @@ body {
     }
     .sidebar-header {
         margin-bottom: 30px;
-        /* Ensure it's displayed if you want the logo visible on mobile too */
-        display: flex; 
+        display: flex;
     }
     .nav-link span {
         display: none;
@@ -157,12 +156,59 @@ body {
     .nav-link i {
         margin-right: 0;
     }
-    /* Adjust logo size for smaller screens if needed */
     .logo-placeholder img {
-        max-width: 80px; /* Smaller logo for mobile */
+        max-width: 80px;
     }
     .main-content {
         padding: 20px;
+    }
+    .main-content h1 {
+        font-size: 24px;
+    }
+    .chart-wrapper {
+        min-width: 250px;
+        height: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        width: 60px;
+        padding: 10px;
+    }
+    .sidebar-header {
+        margin-bottom: 20px;
+    }
+    .logo-placeholder img {
+        max-width: 50px;
+    }
+    .nav-link {
+        padding: 10px;
+    }
+    .main-content {
+        padding: 15px;
+    }
+    .main-content h1 {
+        font-size: 20px;
+    }
+    .main-content h2 {
+        font-size: 18px;
+    }
+    .charts-container {
+        gap: 15px;
+    }
+    .chart-wrapper {
+        min-width: 200px;
+        height: 250px;
+        padding: 15px;
+    }
+    .table-container {
+        padding: 15px;
+    }
+    .history-table th,
+    .history-table td {
+        padding: 8px 10px;
+        font-size: 12px;
     }
 }
 

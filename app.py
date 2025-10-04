@@ -5,19 +5,15 @@ from flask import Flask, request, render_template, redirect, flash, url_for, ses
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import google.generativeai as genai
-
-# Import your custom calculation and PDF modules
 from calc_job import calc_job_tax_new_regime 
 from calc_bus import calc_bus_tax_new_regime 
 from calc_gst import calculate_gst 
 from pdf_gen import create_tax_report as create_job_report
 from bus_pdf_gen import create_tax_report as create_business_report
 
-# --- App Configuration ---
 app = Flask(__name__)
 app.secret_key = 'your_super_secret_key_12345'
 
-# Load environment variables from .env file
 load_dotenv()
 
 # Configure Gemini API key
@@ -144,9 +140,7 @@ def details():
                 cursor.execute("INSERT OR IGNORE INTO user_pan_mapping (pan_id, person_id) VALUES (?, ?)", (pan_id, person_id))
 
             if category == "business":
-                # --- FIX: Delete JOB record to ensure user lands on business dashboard next time ---
                 cursor.execute("DELETE FROM job_person WHERE person_id = ?", (person_id,))
-                # ---------------------------------------------------------------------------------
                 business_name = request.form.get('Bussname')
                 cursor.execute("INSERT OR IGNORE INTO businesses (person_id, business_name) VALUES (?, ?)", (person_id, business_name))
                 business = cursor.execute("SELECT id FROM businesses WHERE person_id = ?", (person_id,)).fetchone()
@@ -156,9 +150,7 @@ def details():
                 return redirect(url_for("business_details"))
 
             elif category == "job":
-                # --- FIX: Delete BUSINESS record to ensure user lands on job dashboard next time ---
                 cursor.execute("DELETE FROM businesses WHERE person_id = ?", (person_id,))
-                # ------------------------------------------------------------------------------------
                 cursor.execute("INSERT OR IGNORE INTO job_person (person_id, employer_category, employer_tan_number) VALUES (?, ?, ?)",
                                (person_id, request.form.get('empc'), request.form.get('tan')))
                 job_person = cursor.execute("SELECT id FROM job_person WHERE person_id = ?", (person_id,)).fetchone()
@@ -230,13 +222,11 @@ def business_result():
     if GEMINI_API_KEY:
         try:
             prompt = f"Analyze this business data and provide 2-3 simple tax tips: Revenue ₹{gross_revenue:,.2f}, Expenses ₹{total_expenses:,.2f}, 80C Investment ₹{fin_deductions.get('section_80c', 0):,.2f}"
-            # FIX: Changed model name to a current, stable model
             model = genai.GenerativeModel('gemini-2.5-flash')
             response = model.generate_content(prompt)
             insights = response.text
         except Exception as e:
             print(f"Error calling Gemini API: {e}")
-            # It already is the default failure message, but setting it again for clarity.
             insights = "Could not generate AI insights at this time."
 
     with sqlite3.connect(db_path) as conn:
@@ -302,13 +292,11 @@ def job_result():
             health_insurance_80d = job_deductions.get('health_ins_self', 0) + job_deductions.get('health_ins_parents', 0)
             
             prompt = f"Analyze this salaried employee's data and give 2-3 tax tips: Gross Salary ₹{gross_income:,.2f}, 80C Investments ₹{section_80c_total:,.2f}, 80D Health Insurance ₹{health_insurance_80d:,.2f}"
-            # FIX: Changed model name to a current, stable model
             model = genai.GenerativeModel('gemini-2.5-flash')
             response = model.generate_content(prompt)
             insights = response.text
         except Exception as e:
             print(f"Error calling Gemini API: {e}")
-            # It already is the default failure message, but setting it again for clarity.
             insights = "Could not generate AI insights at this time."
 
     with sqlite3.connect(db_path) as conn:
@@ -367,7 +355,6 @@ def dashboard_business():
     gst_data_yearly = [sum(yearly_data[year]['gst_payable']) for year in sorted_years]
     tax_data_yearly = [sum(yearly_data[year]['final_tax_payable']) for year in sorted_years]
 
-    # --- Point-by-point data (like job dashboard) ---
     labels = [f"Calc {i+1} ({row['created_at'].split(' ')[0]})" for i, row in enumerate(history_for_template)]
     revenue_data = [float(row['gross_income'] or 0) for row in history_for_template]
     gst_data = [float(row['gst_payable'] or 0) for row in history_for_template]
@@ -377,12 +364,10 @@ def dashboard_business():
         'dash_bus.html',
         history=history_for_template,
         pan_number=pan_id,
-        # detailed (each calculation)
         labels=labels,
         revenue_data=revenue_data,
         gst_data=gst_data,
         tax_data=tax_data,
-        # aggregated yearly (optional use in template if needed)
         yearly_labels=yearly_labels,
         revenue_data_yearly=revenue_data_yearly,
         gst_data_yearly=gst_data_yearly,
@@ -403,7 +388,6 @@ def dashboard_job():
         
     history_for_template = [dict(row) for row in history]
     
-    # Prepare chart data (chronological order)
     labels = [row['financial_year'] for row in reversed(history_for_template)]
     gross_income_data = [row['gross_income'] for row in reversed(history_for_template)]
     tax_data = [row['tax'] for row in reversed(history_for_template)]
@@ -436,7 +420,6 @@ def download_business_report():
     bus_expenses = session.get('business_expenses', {})
     fin_deductions = session.get('finance_deduction', {})
 
-    # Get personal info
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         person = cursor.execute("SELECT * FROM people_info WHERE id = ?", (session.get('person_id'),)).fetchone()
