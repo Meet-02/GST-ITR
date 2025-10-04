@@ -223,7 +223,8 @@
             <div class="download-area">
                 <a href="{{ url_for('download_job_report') }}" class="download-btn">Download as PDF</a>
                 <br><br>
-                <a href="{{ url_for('dashboard_job') }}" class="download-btn" style="background-color: #007bff;">Back to Dashboard</a>
+                <a href="{{ url_for('dashboard_job') }}" class="download-btn" style="background-color: #007bff;">Back to
+                    Dashboard</a>
             </div>
             {% if insights %}
             <div class="insights-card">
@@ -231,7 +232,7 @@
                     💡 AI-Powered Tax Saving Tips
                 </div>
                 <div class="insights-content">
-                    {{ insights }}
+                    {{ insights | safe }}
                 </div>
             </div>
             {% endif %}

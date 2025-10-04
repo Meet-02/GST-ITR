@@ -229,9 +229,9 @@ def business_result():
     insights = ""
     if GEMINI_API_KEY:
         try:
-            # FIX: Corrected f-string formatting from template style to Python style
             prompt = f"Analyze this business data and provide 2-3 simple tax tips: Revenue ₹{gross_revenue:,.2f}, Expenses ₹{total_expenses:,.2f}, 80C Investment ₹{fin_deductions.get('section_80c', 0):,.2f}"
-            model = genai.GenerativeModel('gemini-pro')
+            # FIX: Changed model name to a current, stable model
+            model = genai.GenerativeModel('gemini-2.5-flash')
             response = model.generate_content(prompt)
             insights = response.text
         except Exception as e:
@@ -301,9 +301,9 @@ def job_result():
             section_80c_total = sum(job_deductions.get(k, 0) for k in ['epf_ppf', 'life_ins', 'elss', 'home_loan_principal', 'tuition', 'other_80c'])
             health_insurance_80d = job_deductions.get('health_ins_self', 0) + job_deductions.get('health_ins_parents', 0)
             
-            # FIX: Corrected f-string formatting from template style to Python style
             prompt = f"Analyze this salaried employee's data and give 2-3 tax tips: Gross Salary ₹{gross_income:,.2f}, 80C Investments ₹{section_80c_total:,.2f}, 80D Health Insurance ₹{health_insurance_80d:,.2f}"
-            model = genai.GenerativeModel('gemini-pro')
+            # FIX: Changed model name to a current, stable model
+            model = genai.GenerativeModel('gemini-2.5-flash')
             response = model.generate_content(prompt)
             insights = response.text
         except Exception as e:
